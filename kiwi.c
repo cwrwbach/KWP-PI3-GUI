@@ -1,5 +1,3 @@
-
-
 #include <stdbool.h>
 #include <unistd.h> 
 #include <fcntl.h>
@@ -10,9 +8,7 @@
 //#include <liquid.h>
 #include <alsa/asoundlib.h>
 #include <math.h>
-
-
-
+#include <vws/websocket.h>
 
 #define SERVER "192.168.2.222" //222"
 #define PORT 11361	
@@ -36,10 +32,98 @@ int control_packet[32];
 struct sockaddr_in si_other;
 int slen=sizeof(si_other);
 
+int test_spin;
+
+vws_cnx* cnx;
+int debug;
+int watch_dog;
+
+//===========================
 
 
+setup_kiwi()
+{
+cnx = vws_cnx_new();    
+char uri_string[256];
+
+printf(" LINE %d \n",__LINE__);
+
+// Set connection timeout to 2 seconds (the default is 10). This applies
+// both to connect() and to read operations (i.e. poll()).
+vws_socket_set_timeout((vws_socket*)cnx, 5);
+
+printf(" LINE %d \n",__LINE__);
+
+sleep(4);
+
+time_t utc_now = time( NULL );
+printf(" utc %d \n" , utc_now);
+
+//Complete 'GET' header string is:
+sprintf(uri_string,"ws://norsom.proxy.kiwisdr.com:8073/%d/W/F",utc_now);
+printf("Header string: %s\n",uri_string);
+
+if (vws_connect(cnx, uri_string) == false)
+    {
+    printf("Failed to connect to the WebSocket server\n");
+    vws_cnx_free(cnx);
+    return 1;
+    }
+
+// Can check connection state this way. 
+assert(vws_socket_is_connected((vws_socket*)cnx) == true);
+
+// Enable tracing - dump frames to the console in human-readable format.
+vws.tracelevel = VT_PROTOCOL;
+
+//Commands to the KIWISDR to set up a waterfall
+// Send a TEXT frame
+vws_frame_send_text(cnx, "SET auth t=kiwi p=");
+usleep(100000);
+vws_frame_send_text(cnx,"SET zoom=8 cf=15000");
+usleep(100000);
+vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
+usleep(100000);
+vws_frame_send_text(cnx,"SET wf_speed=2");
+usleep(100000);
+vws_frame_send_text(cnx,"SET wf_comp=0");
+usleep(100000);
+vws_frame_send_text(cnx,"SET ident_user=Lowa Wather");
+printf(" Line %d \n",__LINE__);
+
+debug = 0;
+watch_dog=0;    
 
 
+while(0)
+    {   
+   vws_msg* reply = vws_msg_recv(cnx);
+
+    if (reply == NULL)
+        {
+        printf(" No Message  recd. Line: %d \n",__LINE__);
+        // There was no message received and it resulted in timeout
+        }
+    else
+        {
+        // Free message
+        printf(" Received: %d \n",debug++);
+        if(watch_dog++ > 30)
+            {
+            watch_dog = 0;
+            vws_frame_send_text(cnx,"SET keepalive");
+            }
+
+        for(int i = 0; i< 1024;i++)
+            {
+              fft_video_buf[i] = reply->data->data[i]; //signed dB
+            }
+        vws_msg_free(reply);   
+   
+	}
+	
+    }    
+}
 
 
 
@@ -68,6 +152,35 @@ int rxd_count;
 char id_type;
 char temp_audio[1024];
    
+test_spin = 0;   
+   
+while(0)
+    {   
+   vws_msg* reply = vws_msg_recv(cnx);
+
+    if (reply == NULL)
+        {
+        printf(" No Message  recd. Line: %d \n",__LINE__);
+        // There was no message received and it resulted in timeout
+        }
+    else
+        {
+        // Free message
+        printf(" Received: %d \n",debug++);
+        if(watch_dog++ > 30)
+            {
+            watch_dog = 0;
+            vws_frame_send_text(cnx,"SET keepalive");
+            }
+
+        for(int i = 0; i< 1024;i++)
+            {
+              fft_video_buf[i] = reply->data->data[i]; //signed dB
+            }
+        vws_msg_free(reply);   
+   
+    }
+   
 //get incoming samples from stream 
 while(1) 
     {
@@ -81,7 +194,14 @@ while(1)
 //printf(" GOT A TYPE 42 \n");
 
         for(int i=0; i<1024;i++)
-            fft_video_buf[i] = i/4; //in_pak_buf[i+HEADER_LEN];
+	    {
+            
+	    test_spin++;
+	    if(test_spin > 1023) 
+		test_spin = 0;
+	    fft_video_buf[i] = test_spin/4; //in_pak_buf[i+HEADER_LEN];
+	    }
+test_spin+=10;	    
   
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
         }
@@ -104,8 +224,8 @@ while(1)
   */          
     usleep(1000);
     }
+  }
 }
-
 
 
 void send_control_packet(int type, int val)
@@ -115,7 +235,6 @@ control_packet[type] = val;
 if (sendto(sock_fd, control_packet, sizeof(control_packet) , 0 , (struct sockaddr *) &si_other, slen)==-1)
     die("control message");
 }
-
 
 
 //---
@@ -173,6 +292,7 @@ g_fft_size = FFT_SIZE;
 //err = snd_pcm_set_params(audio_device,SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED,1,audio_sr,1,400000); //latency in uS - Could be dynamic to reduce (unwanted) latency?, 400 ok, 200 ng.
 //if(err !=0)
  //  printf("Error with Audio parameters\n"); //audio 
+
 
 setup_network();
 printf(" Network started \n");

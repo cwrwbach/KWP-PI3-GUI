@@ -194,6 +194,10 @@ int nv;
 //int dummy;
 __u32 dummy = 0;
 
+
+
+setup_kiwi();
+
 start_server_stream();
 
 
