@@ -195,7 +195,6 @@ int quit_request;
 int err;
 int nv;
 int moop;
-//int dummy;
 __u32 dummy = 0;
 
 //ret=pthread_create(&callback_id,NULL, (void *) server_callback,NULL);
@@ -225,51 +224,37 @@ for(int b=0;b<10;b++)
 frame_buf = mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
 clear_screen(0x00000000);
-printf(" LINE %d \n",__LINE__);
 plot_large_string(frame_buf,360,300,"TESTING",WHITE);
 
-//while(1) sleep(1);
-printf(" LINE %d \n",__LINE__);
-
-//plot_line(scope_buf,350,230,350,250,RED);
-printf(" LINE %d \n",__LINE__);
-
-printf(" LINE %d \n",__LINE__);
 for(int b=0;b<10;b++)
     {
     plot_filled_rectangle(frame_buf,5+(b*80),390,BTN_WIDTH,BTN_HEIGHT,DARK_GREEN);
     }
 printf(" LINE %d \n",__LINE__);
 
-//Plot line is buggy (crashing) if valuse out of range! ! ! FIXME
-//plot_line(scope_buf,350,30,360,30,RED);
-
-
 setup_kiwi();
 
-
+//Main Loop
 moop=0;
 while(1)
     {
-
     for(int w=0;w<10;w++)
         err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
 
     draw_grid();
-    //copy grid
     copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 
-read_kiwi_line();
+    read_kiwi_line();
 
 
    //do chosen FFT
   //draw_fill_fft();
- draw_trace_fft();
+    draw_trace_fft();
     //then waterfall
     draw_waterfall();
         usleep(500000);
         
-    printf(" MAIN LOOPING %d : %d\n",moop++,__LINE__) ;   
+    printf("Main: %d : %d",moop++,__LINE__) ;   
     }
 
 printf(" Debug at %d\n",__LINE__);

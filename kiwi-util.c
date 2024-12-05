@@ -13,13 +13,11 @@
 extern char fft_video_buf[FFT_SIZE];
 bool stream_flag;
 
-
 vws_cnx* cnx;
 int debug;
 int watch_dog;
 
 //============================
-
 
 setup_kiwi()
 {
@@ -127,7 +125,7 @@ read_kiwi_line()
     else
         {
         // Free message
-        printf(" Received: %d \n",debug++);
+        printf(" Rxd: %d \n",debug++);
         if(watch_dog++ > 30)
             {
             watch_dog = 0;
@@ -143,7 +141,7 @@ read_kiwi_line()
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
         //draw_trace_fft();
         
-    printf(" LOOPIN RXD %d \n",debug++);
+    printf("Kiwi-line %d ",debug++);
 	}
 	
  }
