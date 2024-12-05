@@ -131,8 +131,8 @@ if(wf_ln > WFALL_HEIGHT)
 //Draw first line of waterfall
 for(point=0;point<800;point++) //FFT SIZE
     {
-    inx = 255-(kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
-    
+    //inx = 255-(kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
+    inx = -1 * (kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
     //printf(" VP %d \n",fft_video_buf[point]);
 
     red = (uint32_t) turbo[inx][0];
@@ -148,7 +148,7 @@ for(point=0;point<800;point++) //FFT SIZE
     set_pixel(wfall_buf,point , 0, colour);
     }
 
-//Scroll all lines up, starting from the bottom
+//Scroll all lines down, starting from the bottom
     for(int ll = WFALL_HEIGHT; ll >=0 ; ll--)
     {
     for(int pp = 0;pp<WFALL_WIDTH;pp++)
@@ -156,7 +156,6 @@ for(point=0;point<800;point++) //FFT SIZE
         wfall_buf[((ll+1)*WFALL_WIDTH)+WFALL_WIDTH+pp] = wfall_buf[((ll)* WFALL_WIDTH)+pp];
         }
     }
-
 copy_surface_to_image(wfall_buf,0,150,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
