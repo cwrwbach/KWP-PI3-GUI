@@ -63,11 +63,11 @@ vws_frame_send_text(cnx,"SET zoom=7 cf=5505");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
 usleep(100000);
-vws_frame_send_text(cnx,"SET wf_speed=3");
+vws_frame_send_text(cnx,"SET wf_speed=2");
 usleep(100000);
 vws_frame_send_text(cnx,"SET wf_comp=0");
 usleep(100000);
-vws_frame_send_text(cnx,"SET ident_user=Lowa Wather");
+vws_frame_send_text(cnx,"SET ident_user=Captain");
 printf(" Line %d \n",__LINE__);
 
 debug = 0;

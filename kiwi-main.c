@@ -97,7 +97,7 @@ for(int k = 0; k < FFT_SIZE; k++)
 {
 if(kiwi_buf[k] > -30) kiwi_buf[k] = -100;    //odd spikes! WHY ??? FIXME
 fft_buf[k] =  kiwi_buf[k] * -1; 
-printf(" k=%d kk=%d kb=%d \n",k,kiwi_buf[k],fft_buf[k]);
+//printf(" k=%d kk=%d kb=%d \n",k,kiwi_buf[k],fft_buf[k]);
 }   
     
 //Plot only the selected central segment of 800 bins.
@@ -105,51 +105,11 @@ nv=0;
 for(int n = 0; n<800; n++)
     {
     val= fft_buf[112+n];
-    plot_line(frame_buf, nv, BASE_LINE , nv, val, MAGENTA);
+    plot_line(scope_buf, nv, BASE_LINE , nv, val, MAGENTA);
     nv++;
     }
 }
 
-
-void xxxdraw_spectrum()
-{
-int bins_n;
-uint8_t val;
-int nv;
-uint8_t db_lev,last;
-
-nv=0;
-bins_n = 800;
-
-//convert kiwi format to dB
-
-
-
-
-for(int iii = 0; iii<800;iii+=1)
-    {
-    db_lev=kiwi_buf[iii]/2;
-   // plot_line(frame_buf,iii,120,iii,db_lev+5,BLUE);
-
-    plot_line(frame_buf,iii,last,iii,db_lev,WHITE);
-    last = db_lev;
-    }
-
-for(int n = 0; n<bins_n; n++)
-    {
-    val = 117 - rand() % 50;
-
-if(n==400) val = 20;
-   // val = fft_video_buf[n];
-    plot_line(frame_buf, nv, val, nv, 117, MAGENTA);
-    
-   // fft_video_buf[n] = val;
-    
-    
-    nv++;
-    }
-    
-}
 //=========
 
 void draw_waterfall()
@@ -252,28 +212,14 @@ setup_kiwi();
 moop=0;
 while(1)
     {
-        
-      draw_spectrum();
-    //then waterfall
     draw_waterfall();    
-        
-        
-    for(int w=0;w<10;w++)
-        err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
-
-    draw_grid();
+    draw_spectrum();      
+             
+    err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
     copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
-
     read_kiwi_line();
-
-   //do chosen FFT
-  //draw_fill_fft();
-    draw_spectrum();
-    //then waterfall
-    draw_waterfall();
-        usleep(10);
-        
-    printf("Main: %d : %d",moop++,__LINE__) ;   
+    draw_grid();
+    //printf("Main: %d : %d",moop++,__LINE__) ;   
     }
 
 printf(" Debug at %d\n",__LINE__);
