@@ -10,7 +10,7 @@
 #define PAK_LEN 1280
 #define HEADER_LEN 256
 
-extern char fft_video_buf[FFT_SIZE];
+extern char kiwi_buf[FFT_SIZE];
 bool stream_flag;
 
 vws_cnx* cnx;
@@ -59,11 +59,11 @@ assert(vws_socket_is_connected((vws_socket*)cnx) == true);
 // Send a TEXT frame
 vws_frame_send_text(cnx, "SET auth t=kiwi p=");
 usleep(100000);
-vws_frame_send_text(cnx,"SET zoom=8 cf=15000");
+vws_frame_send_text(cnx,"SET zoom=7 cf=5505");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
 usleep(100000);
-vws_frame_send_text(cnx,"SET wf_speed=1");
+vws_frame_send_text(cnx,"SET wf_speed=3");
 usleep(100000);
 vws_frame_send_text(cnx,"SET wf_comp=0");
 usleep(100000);
@@ -132,9 +132,9 @@ read_kiwi_line()
             vws_frame_send_text(cnx,"SET keepalive");
             }
 
-        for(int i = 0; i< 800;i++)
+        for(int i = 0; i< FFT_SIZE ;i++)
             {
-              fft_video_buf[i] = reply->data->data[i]; //signed dB
+            kiwi_buf[i] = reply->data->data[i]; //signed dB
             }
         vws_msg_free(reply);   
         

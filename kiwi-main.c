@@ -24,7 +24,7 @@
 #define FRAME_BUF_WIDTH 800
 #define FRAME_BUF_HEIGHT 480
 #define SCOPE_WIDTH 800
-#define SCOPE_HEIGHT 120
+#define SCOPE_HEIGHT 130
 
 #define WFALL_WIDTH 800
 #define WFALL_HEIGHT 200
@@ -37,7 +37,7 @@ struct fb_fix_screeninfo finfo;
 int fbfd; // framebuffer file descriptor
 
 long int screensize ;
-char fft_video_buf[FFT_SIZE];
+int8_t kiwi_buf[FFT_SIZE];
 
 uint screen_size_x;
 uint screen_size_y;
@@ -57,6 +57,11 @@ int n_horiz;
 int n_verts;
 int h_gap,v_gap;
 
+
+plot_filled_rectangle(scope_buf, 0, 0,SCOPE_WIDTH, SCOPE_HEIGHT, DARK_GREEN);
+
+
+
 n_horiz=6;
 n_verts = 12;
 
@@ -74,33 +79,39 @@ plot_thick_rectangle(scope_buf,0,0,SCOPE_WIDTH-2,SCOPE_HEIGHT-2,BLUE);
 
 //------------------
 
-void draw_fill_fft()
+void draw_spectrum()
 {
 int bins_n;
-uint8_t val;
+int val;
 int nv;
-
 nv=0;
 
+int fft_buf[FFT_SIZE];
+
 bins_n = 800;
+int8_t tmp;
 
+#define BASE_LINE 120
 
-for(int n = 0; n<bins_n; n++)
-    {
-    val = 117 - rand() % 50;
-
-    if(n==400) 
-        val = 20;
-    val = fft_video_buf[n]/2;
-    plot_line(frame_buf, nv, val, nv, 117, MAGENTA);
+for(int k = 0; k < FFT_SIZE; k++)
+{
+if(kiwi_buf[k] > -30) kiwi_buf[k] = -100;    //odd spikes! WHY ??? FIXME
+fft_buf[k] =  kiwi_buf[k] * -1; 
+printf(" k=%d kk=%d kb=%d \n",k,kiwi_buf[k],fft_buf[k]);
+}   
     
+//Plot only the selected central segment of 800 bins.
+nv=0;
+for(int n = 0; n<800; n++)
+    {
+    val= fft_buf[112+n];
+    plot_line(frame_buf, nv, BASE_LINE , nv, val, MAGENTA);
     nv++;
     }
 }
 
 
-
-void draw_trace_fft()
+void xxxdraw_spectrum()
 {
 int bins_n;
 uint8_t val;
@@ -110,9 +121,14 @@ uint8_t db_lev,last;
 nv=0;
 bins_n = 800;
 
+//convert kiwi format to dB
+
+
+
+
 for(int iii = 0; iii<800;iii+=1)
     {
-    db_lev=fft_video_buf[iii]/2;
+    db_lev=kiwi_buf[iii]/2;
    // plot_line(frame_buf,iii,120,iii,db_lev+5,BLUE);
 
     plot_line(frame_buf,iii,last,iii,db_lev,WHITE);
@@ -155,7 +171,7 @@ if(wf_ln > WFALL_HEIGHT)
 //Draw first line of waterfall
 for(point=0;point<800;point++) //FFT SIZE
     {
-    inx = 255-(fft_video_buf[point]);
+    inx = 255-(kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
     
     //printf(" VP %d \n",fft_video_buf[point]);
 
@@ -193,13 +209,8 @@ short rgba;
 int screenbytes;
 int quit_request;
 int err;
-int nv;
 int moop;
 __u32 dummy = 0;
-
-//ret=pthread_create(&callback_id,NULL, (void *) server_callback,NULL);
-
-nv=0;
 
 fbfd = open("/dev/fb0", O_RDWR); // Open the framebuffer device file for reading and writing
 if (fbfd == -1) 
@@ -224,20 +235,29 @@ for(int b=0;b<10;b++)
 frame_buf = mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
 clear_screen(0x00000000);
-plot_large_string(frame_buf,360,300,"TESTING",WHITE);
+
 
 for(int b=0;b<10;b++)
     {
     plot_filled_rectangle(frame_buf,5+(b*80),390,BTN_WIDTH,BTN_HEIGHT,DARK_GREEN);
     }
-printf(" LINE %d \n",__LINE__);
 
+plot_large_string(frame_buf,320,300,"WAITING FOR KIWI",WHITE);
 setup_kiwi();
+
+//Maybe start another thread here:
+//ret=pthread_create(&callback_id,NULL, (void *) server_callback,NULL);
 
 //Main Loop
 moop=0;
 while(1)
     {
+        
+      draw_spectrum();
+    //then waterfall
+    draw_waterfall();    
+        
+        
     for(int w=0;w<10;w++)
         err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
 
@@ -246,13 +266,12 @@ while(1)
 
     read_kiwi_line();
 
-
    //do chosen FFT
   //draw_fill_fft();
-    draw_trace_fft();
+    draw_spectrum();
     //then waterfall
     draw_waterfall();
-        usleep(500000);
+        usleep(10);
         
     printf("Main: %d : %d",moop++,__LINE__) ;   
     }
