@@ -17,7 +17,7 @@ extern uint16_t * frame_buf;
 void set_pixel(uint16_t * buf,int x, int y, uint16_t colour)
 {
 int sz_x,sz_y;
-uint16_t location;
+int32_t location;
 
 sz_x = screen_size_x;
 sz_y = screen_size_y;
@@ -62,6 +62,7 @@ for (;;) //evah
     if (e2 <= dx) { err += dx; y0 += sy; } // e_xy+e_y < 0 
     }
 }
+
 void plot_dotted_line (uint16_t * buf, int x0, int y0, int x1, int y1,uint16_t colour)
 {
 int dx =  abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
@@ -122,9 +123,9 @@ void plot_filled_rectangle(uint16_t * buf, int x0, int y0,int sz_x, int sz_y, ui
 for(int n = 0; n< sz_y;n++)
     {
 plot_line(buf, x0, y0+n, x0+sz_x, y0+n,colour);
-//plot_line(buf, x0, y0+sz_y, x0+sz_x, y0+sz_y,colour);
-//plot_line(buf, x0, y0, x0, y0+sz_y,colour);
-//plot_line(buf, x0+sz_x, y0, x0+sz_x, y0+sz_y,colour);
+plot_line(buf, x0, y0+sz_y, x0+sz_x, y0+sz_y,colour);
+plot_line(buf, x0, y0, x0, y0+sz_y,colour);
+plot_line(buf, x0+sz_x, y0, x0+sz_x, y0+sz_y,colour);
     }
 }
 
@@ -179,7 +180,7 @@ void copy_surface_to_image(uint16_t *buf,uint loc_x,uint loc_y,uint sz_x,uint sz
 {
 int x,y;
 int y_offset;
-uint16_t src_ptr;
+int src_ptr;
 
 src_ptr=0;
 

@@ -22,6 +22,8 @@ void plot_thick_line (uint16_t * buf, int x0, int y0, int x1, int y1,uint16_t co
 
 void plot_rectangle(uint16_t * buf, int x0, int y0,int sz_x, int sz_y, uint16_t colour);
 
+void plot_filled_rectangle(uint16_t * buf, int x0, int y0,int sz_x, int sz_y, uint16_t colour);
+
 void plot_thick_rectangle(uint16_t * buf, int x0, int y0,int sz_x, int sz_y,uint16_t colour);
 
 /*

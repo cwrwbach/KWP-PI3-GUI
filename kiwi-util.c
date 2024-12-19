@@ -19,7 +19,7 @@ int watch_dog;
 
 //============================
 
-setup_kiwi()
+void setup_kiwi()
 {
 cnx = vws_cnx_new();    
 char uri_string[256];
@@ -46,7 +46,7 @@ if (vws_connect(cnx, uri_string) == false)
     {
     printf("Failed to connect to the WebSocket server\n");
     vws_cnx_free(cnx);
-    return 1;
+    return; // 1;
     }
 
 // Can check connection state this way. 
@@ -113,7 +113,7 @@ while(1)
 
 
 
-read_kiwi_line()
+void read_kiwi_line()
     {   
    vws_msg* reply = vws_msg_recv(cnx);
 

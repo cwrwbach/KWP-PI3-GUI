@@ -21,10 +21,11 @@
 
 #define FFT_SIZE 1024
 
-#define FRAME_BUF_WIDTH 800
-#define FRAME_BUF_HEIGHT 480
-#define SCOPE_WIDTH 800
-#define SCOPE_HEIGHT 130
+#define FRAME_BUF_WIDTH 1366
+#define FRAME_BUF_HEIGHT 768
+
+#define SCOPE_WIDTH 1366
+#define SCOPE_HEIGHT 400
 
 #define WFALL_WIDTH 800
 #define WFALL_HEIGHT 200
@@ -70,12 +71,15 @@ v_gap = SCOPE_WIDTH/(n_verts-2);
 h_gap = SCOPE_HEIGHT/(n_horiz);
 
 for(i=1;i<n_horiz;i++)
-    plot_dotted_line(scope_buf,0,i*h_gap,SCOPE_WIDTH,i*h_gap,0x00808000);//YELLOW);
+    plot_dotted_line(scope_buf,0,i*h_gap,SCOPE_WIDTH,i*h_gap,C_YELLOW);//YELLOW);
 
 for(i=1;i<n_verts-2;i++)
-    plot_dotted_line(scope_buf,i*v_gap,0,i*v_gap,SCOPE_HEIGHT,0x00008000);//);
+    plot_dotted_line(scope_buf,i*v_gap,0,i*v_gap,SCOPE_HEIGHT,C_YELLOW);//);
 
-plot_thick_rectangle(scope_buf,0,0,SCOPE_WIDTH-2,SCOPE_HEIGHT-2,C_BLUE);
+
+
+//plot_line(scope_buf,400,0,400,300,C_RED);
+//plot_rectangle(scope_buf,0,0,SCOPE_WIDTH-4,SCOPE_HEIGHT-4,C_BLUE);
 }
 
 //------------------
@@ -89,7 +93,7 @@ nv=0;
 
 int fft_buf[FFT_SIZE];
 
-bins_n = 800;
+bins_n = 1024;
 int8_t tmp;
 
 #define BASE_LINE 120
@@ -109,6 +113,8 @@ for(int n = 0; n<800; n++)
     plot_line(scope_buf, nv, BASE_LINE , nv, val, C_MAGENTA);
     nv++;
     }
+    
+    //copy_surface_to_image(scope_buf,0,150,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
 //=========
@@ -175,6 +181,57 @@ for(long pppp=0;pppp<(screen_size_x*screen_size_y);pppp++)
 }
 //=========
 
+
+void main_was_good()
+{
+unsigned int red,green,blue;
+short rgba;
+int screenbytes;
+int quit_request;
+int err;
+int moop;
+__u32 dummy = 0;
+
+fbfd = open("/dev/fb0", O_RDWR); // Open the framebuffer device file for reading and writing
+if (fbfd == -1) 
+    printf("Error: cannot open framebuffer device.\n");
+ 
+if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo)) // Get variable screen information
+	    printf("Error reading variable screen info.\n");
+printf("Display info %dx%d, %d bpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel );
+
+screen_size_x = vinfo.xres;
+screen_size_y = vinfo.yres;
+bytes_pp = vinfo.bits_per_pixel/8;
+
+int fb_data_size = screen_size_x * screen_size_y * bytes_pp;
+printf (" FB data size = %d \n",fb_data_size);
+
+
+
+// map framebuffer to user memory 
+frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
+
+while(1) {printf(" LINE %d \n",__LINE__);sleep(1);}
+
+clear_mable(C_GRAY);
+
+
+
+for(int x=171;x<1024+171;x++)
+    {
+    set_pixel(frame_buf,x,200,C_RED);
+    }
+
+
+
+
+}
+
+
+
+//==========
+
 void main()
 {
 unsigned int red,green,blue;
@@ -209,22 +266,20 @@ for(int b=0;b<10;b++)
 // map framebuffer to user memory 
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
-//while(1) {printf(" LINE %d \n",__LINE__);sleep(1);}
-
-clear_mable(C_GREEN);
+clear_mable(C_GRAY);
 //clear_screen(rgb565(0,120,0));
 
-for(int b=0;b<10;b++)
-    {
-    plot_filled_rectangle(frame_buf,5+(b*80),390,BTN_WIDTH,BTN_HEIGHT,C_DARK_GREEN);
-    }
+//for(int b=0;b<10;b++)
+//    {
+//    plot_filled_rectangle(frame_buf,5+(b*80),390,BTN_WIDTH,BTN_HEIGHT,C_DARK_GREEN);
+//    }
 
 plot_large_string(frame_buf,320,300,"WAITING FOR KIWI",C_WHITE);
-setup_kiwi();
+//setup_kiwi();
 
 //Maybe start another thread here:
 //ret=pthread_create(&callback_id,NULL, (void *) server_callback,NULL);
-
+printf(" DONE intro\n");
 //Main Loop
 moop=0;
 
@@ -236,11 +291,20 @@ while(1)
    draw_spectrum();      
              
     err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
-    //copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+    copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
    // read_kiwi_line();
-  //  draw_grid();
+   
+
+   //draw_grid();
     //printf("Main: %d : %d",moop++,__LINE__) ;   
     }
+
+//plot_line(frame_buf,0,200,400,200,C_WHITE);
+//plot_line(scope_buf,400,0,400,300,C_RED);
+
+
+
+copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 
 printf(" Debug at %d\n",__LINE__);
 sleep(1);
