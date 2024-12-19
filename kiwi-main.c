@@ -41,12 +41,13 @@ int8_t kiwi_buf[FFT_SIZE];
 
 uint screen_size_x;
 uint screen_size_y;
+uint bytes_pp;
 uint status_pos;
 
-uint32_t * frame_buf;
-uint32_t * scope_buf;
-uint32_t * wfall_buf;
-uint32_t * btn_buf[10];
+uint16_t * frame_buf;
+uint16_t * scope_buf;
+uint16_t * wfall_buf;
+uint16_t * btn_buf[10];
 
 //================
 
@@ -58,7 +59,7 @@ int n_verts;
 int h_gap,v_gap;
 
 
-plot_filled_rectangle(scope_buf, 0, 0,SCOPE_WIDTH, SCOPE_HEIGHT, DARK_GREEN);
+plot_filled_rectangle(scope_buf, 0, 0,SCOPE_WIDTH, SCOPE_HEIGHT, C_DARK_GREEN);
 
 
 
@@ -74,7 +75,7 @@ for(i=1;i<n_horiz;i++)
 for(i=1;i<n_verts-2;i++)
     plot_dotted_line(scope_buf,i*v_gap,0,i*v_gap,SCOPE_HEIGHT,0x00008000);//);
 
-plot_thick_rectangle(scope_buf,0,0,SCOPE_WIDTH-2,SCOPE_HEIGHT-2,BLUE);
+plot_thick_rectangle(scope_buf,0,0,SCOPE_WIDTH-2,SCOPE_HEIGHT-2,C_BLUE);
 }
 
 //------------------
@@ -105,7 +106,7 @@ nv=0;
 for(int n = 0; n<800; n++)
     {
     val= fft_buf[112+n];
-    plot_line(scope_buf, nv, BASE_LINE , nv, val, MAGENTA);
+    plot_line(scope_buf, nv, BASE_LINE , nv, val, C_MAGENTA);
     nv++;
     }
 }
@@ -114,7 +115,7 @@ for(int n = 0; n<800; n++)
 
 void draw_waterfall()
 {
-uint32_t colour,red,green,blue;
+uint16_t colour,red,green,blue;
 int point;
 unsigned char fft_val;
 int loc_x,loc_y;
@@ -131,13 +132,13 @@ if(wf_ln > WFALL_HEIGHT)
 //Draw first line of waterfall
 for(point=0;point<800;point++) //FFT SIZE
     {
-    //inx = 255-(kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
+    inx = 255-(kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
     inx = -1 * (kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
     //printf(" VP %d \n",fft_video_buf[point]);
 
-    red = (uint32_t) turbo[inx][0];
-    green=(uint32_t) turbo[inx][1];
-    blue =(uint32_t) turbo[inx][2];
+    red = (uint16_t) turbo[inx][0];
+    green=(uint16_t) turbo[inx][1];
+    blue =(uint16_t) turbo[inx][2];
     red = red<<16;
     green = green <<8;
 
@@ -148,6 +149,7 @@ for(point=0;point<800;point++) //FFT SIZE
     set_pixel(wfall_buf,point , 0, colour);
     }
 
+
 //Scroll all lines down, starting from the bottom
     for(int ll = WFALL_HEIGHT; ll >=0 ; ll--)
     {
@@ -156,9 +158,21 @@ for(point=0;point<800;point++) //FFT SIZE
         wfall_buf[((ll+1)*WFALL_WIDTH)+WFALL_WIDTH+pp] = wfall_buf[((ll)* WFALL_WIDTH)+pp];
         }
     }
+    
 copy_surface_to_image(wfall_buf,0,150,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
+
+//======
+
+void clear_mable(uint16_t pixval)
+{
+for(long pppp=0;pppp<(screen_size_x*screen_size_y);pppp++)
+    {
+    //printf(" P+ %d \n",pppp);
+    frame_buf[pppp] = pixval;
+    }
+}
 //=========
 
 void main()
@@ -181,27 +195,31 @@ printf("Display info %dx%d, %d bpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pi
 
 screen_size_x = vinfo.xres;
 screen_size_y = vinfo.yres;
+bytes_pp = vinfo.bits_per_pixel/8;
 
-int fb_data_size = 800 * 480 * 4;
+int fb_data_size = screen_size_x * screen_size_y * bytes_pp;
+printf (" FB data size = %d \n",fb_data_size);
 
-scope_buf = malloc(SCOPE_WIDTH*SCOPE_HEIGHT*4);
-wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*4);
+scope_buf = malloc(SCOPE_WIDTH*SCOPE_HEIGHT*bytes_pp);
+wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*bytes_pp);
 
 for(int b=0;b<10;b++)
-    btn_buf[b] = malloc(BTN_WIDTH*BTN_HEIGHT*4);
+    btn_buf[b] = malloc(BTN_WIDTH*BTN_HEIGHT*bytes_pp);
 
 // map framebuffer to user memory 
-frame_buf = mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
+frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
-clear_screen(0x00000000);
+//while(1) {printf(" LINE %d \n",__LINE__);sleep(1);}
 
+clear_mable(C_GREEN);
+//clear_screen(rgb565(0,120,0));
 
 for(int b=0;b<10;b++)
     {
-    plot_filled_rectangle(frame_buf,5+(b*80),390,BTN_WIDTH,BTN_HEIGHT,DARK_GREEN);
+    plot_filled_rectangle(frame_buf,5+(b*80),390,BTN_WIDTH,BTN_HEIGHT,C_DARK_GREEN);
     }
 
-plot_large_string(frame_buf,320,300,"WAITING FOR KIWI",WHITE);
+plot_large_string(frame_buf,320,300,"WAITING FOR KIWI",C_WHITE);
 setup_kiwi();
 
 //Maybe start another thread here:
@@ -209,15 +227,18 @@ setup_kiwi();
 
 //Main Loop
 moop=0;
+
+//while(1) {printf(" LINE %d \n",__LINE__);sleep(1);}
+
 while(1)
     {
     draw_waterfall();    
-    draw_spectrum();      
+   draw_spectrum();      
              
     err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
-    copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
-    read_kiwi_line();
-    draw_grid();
+    //copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+   // read_kiwi_line();
+  //  draw_grid();
     //printf("Main: %d : %d",moop++,__LINE__) ;   
     }
 
