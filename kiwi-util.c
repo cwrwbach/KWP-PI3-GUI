@@ -21,6 +21,43 @@ void * read_kiwi_line();
 extern pthread_t callback_id;
 //============================
 
+
+int qt_jet(int i)
+{        
+
+        
+uint8_t col[3] = {255,255,255};
+//uint8_t shade[3] = {255,255,255} ;  
+  
+    if (i<43)
+        {col[0] = 0; col[1] = 0; col[2] = 255*i/43;}
+        //col[3] = { 0,0, 255*(i)/43};
+
+    if( (i>=43) && (i<87) )
+         {col[0] = 0; col[1] = 255*(i-43)/43; col[2] = 255;}
+        //col = ( 0, 255*(i-43)/43, 255 );
+
+    if( (i>=87) && (i<120) )
+         {col[0] = 0; col[1] = 255; col[2] = 255-(255*(i-87)/32);}
+        //col = ( 0,255, 255-(255*(i-87)/32));
+
+    if( (i>=120) && (i<154) )
+        {col[0] = (255*(i-120)/33); col[1] = 255; col[2] = 0;}
+        //col = ( (255*(i-120)/33), 255, 0);
+
+    if( (i>=154) && (i<217) )
+        {col[0] = 255; col[1] = 255 - (255*(i-154)/62); col[2] = 0;}
+        //col = ( 255, 255 - (255*(i-154)/62), 0);
+
+    if (i>=217)
+        {col[0] = 255; col[1] = 0; col[2] = (128*(i-217)/38);}
+           //col = ( 255, 0, 128*(i-217)/38);
+
+        
+    return(col);
+}
+
+
 void  * setup_kiwi()
 {
 cnx = vws_cnx_new();    
@@ -31,7 +68,7 @@ char fft_video_buf[1536];
 
 printf(" LINE %d \n",__LINE__);
 
-// Set connection timeout to 2 seconds (the default is 10). This applies
+// Set connection timeout to 5 seconds (the default is 10). This applies
 // both to connect() and to read operations (i.e. poll()).
 vws_socket_set_timeout((vws_socket*)cnx, 5);
 
@@ -80,7 +117,7 @@ watch_dog=0;
 
 while(1)
     {   
-   vws_msg* reply = vws_msg_recv(cnx);
+    vws_msg* reply = vws_msg_recv(cnx);
 
     if (reply == NULL)
         {
@@ -105,9 +142,9 @@ while(1)
         
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
         //draw_trace_fft();
- draw_waterfall();      
+        draw_waterfall();      
     //printf(" LOOPIN RXD %d \n",debug++);
-	}
+        }
 	
     }   
 

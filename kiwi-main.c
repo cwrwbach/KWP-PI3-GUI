@@ -162,18 +162,7 @@ for(point=0;point<1024;point++) //FFT SIZE
 copy_surface_to_image(wfall_buf,0,150,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
-
 //======
-
-void clear_mable(uint16_t pixval)
-{
-for(long pppp=0;pppp<(screen_size_x*screen_size_y);pppp++)
-    {
-    //printf(" P+ %d \n",pppp);
-    frame_buf[pppp] = pixval;
-    }
-}
-//=========
 
 void main()
 {
@@ -206,7 +195,7 @@ wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*bytes_pp);
 // map framebuffer to user memory 
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
-clear_screen(rgb565(0,5,0));
+clear_screen(rgb565(0,3,0));
 
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
 
@@ -220,15 +209,8 @@ printf(" SETUP ==========================  \n");
 
 while(1)
     {
-    //draw_waterfall();    
-    //draw_spectrum();      
-             
-   // err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
-  //  copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
-   // read_kiwi_line();
-   
-printf(" FAB \n");
-sleep(2);
+    printf(" FAB \n");
+    sleep(2);
 
    //draw_grid();
     //printf("Main: %d : %d",moop++,__LINE__) ;   
