@@ -43,6 +43,7 @@ uint16_t * frame_buf;
 uint16_t * scope_buf;
 uint16_t * wfall_buf;
 
+uint8_t qtj[3];
 
 void * setup_kiwi();
 //void read_kiwi_line();
@@ -132,19 +133,24 @@ if(wf_ln > WFALL_HEIGHT)
 //Draw first line of waterfall
 for(point=0;point<1024;point++) //FFT SIZE
     {
-    inx = 255-(kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
-    inx = -1 * (kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
+    //inx = 255-(kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
+    //inx = -1 * (kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
     //printf(" VP %d \n",fft_video_buf[point]);
 
-    red = (uint16_t) turbo[inx][0];
-    green=(uint16_t) turbo[inx][1];
-    blue =(uint16_t) turbo[inx][2];
+    qt_jet(inx);
+
+    red = (uint16_t) qtj[0];
+    green=(uint16_t) qtj[1];
+    blue =(uint16_t) qtj[2];
     red = red<<16;
     green = green <<8;
 
     colour = red ;
     colour = colour | blue ;
     colour = colour | green;
+
+
+    
 
     set_pixel(wfall_buf,point , 0, colour);
     }

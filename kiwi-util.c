@@ -17,6 +17,8 @@ vws_cnx* cnx;
 int debug;
 int watch_dog;
 
+
+extern uint8_t qtj[3];
 void * read_kiwi_line();
 extern pthread_t callback_id;
 //============================
@@ -52,9 +54,9 @@ uint8_t col[3] = {255,255,255};
     if (i>=217)
         {col[0] = 255; col[1] = 0; col[2] = (128*(i-217)/38);}
            //col = ( 255, 0, 128*(i-217)/38);
-
-        
-    return(col);
+ qtj[0] = col[0]; 
+ qtj[1] = col[1]; 
+ qtj[2] = col[2]; 
 }
 
 
