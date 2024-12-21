@@ -24,8 +24,8 @@
 #define FRAME_BUF_HEIGHT 768
 #define SCOPE_WIDTH 1366
 #define SCOPE_HEIGHT 400
-#define WFALL_WIDTH 800
-#define WFALL_HEIGHT 200
+#define WFALL_WIDTH 1366
+#define WFALL_HEIGHT 600
 
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
@@ -42,7 +42,7 @@ uint status_pos;
 uint16_t * frame_buf;
 uint16_t * scope_buf;
 uint16_t * wfall_buf;
-uint16_t * btn_buf[10];
+
 
 void * setup_kiwi();
 //void read_kiwi_line();
@@ -130,7 +130,7 @@ if(wf_ln > WFALL_HEIGHT)
     wf_ln = 1;
 
 //Draw first line of waterfall
-for(point=0;point<800;point++) //FFT SIZE
+for(point=0;point<1024;point++) //FFT SIZE
     {
     inx = 255-(kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
     inx = -1 * (kiwi_buf[point+112]); //adjusted to central 800 points !!! FIXME
@@ -144,7 +144,7 @@ for(point=0;point<800;point++) //FFT SIZE
 
     colour = red ;
     colour = colour | blue ;
-    colour - colour | green;
+    colour = colour | green;
 
     set_pixel(wfall_buf,point , 0, colour);
     }
@@ -206,7 +206,7 @@ wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*bytes_pp);
 // map framebuffer to user memory 
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
-clear_screen(rgb565(0,0,40));
+clear_screen(rgb565(0,5,0));
 
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
 
@@ -223,18 +223,18 @@ while(1)
     //draw_waterfall();    
     //draw_spectrum();      
              
-    err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
-    copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+   // err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
+  //  copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
    // read_kiwi_line();
    
 printf(" FAB \n");
 sleep(2);
 
-   draw_grid();
+   //draw_grid();
     //printf("Main: %d : %d",moop++,__LINE__) ;   
     }
 
-copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+//copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 
 printf(" Debug at %d\n",__LINE__);
 sleep(1);
