@@ -17,15 +17,17 @@ vws_cnx* cnx;
 int debug;
 int watch_dog;
 
+void * read_kiwi_line();
+extern pthread_t callback_id;
 //============================
 
-void setup_kiwi()
+void  * setup_kiwi()
 {
 cnx = vws_cnx_new();    
 char uri_string[256];
-pthread_t callback_id,audio_cb_id;
+//pthread_t callback_id,audio_cb_id;
 int ret;
-
+char fft_video_buf[1536];
 
 printf(" LINE %d \n",__LINE__);
 
@@ -46,7 +48,7 @@ if (vws_connect(cnx, uri_string) == false)
     {
     printf("Failed to connect to the WebSocket server\n");
     vws_cnx_free(cnx);
-    return; // 1;
+    //return; // 1;
     }
 
 // Can check connection state this way. 
@@ -59,11 +61,11 @@ assert(vws_socket_is_connected((vws_socket*)cnx) == true);
 // Send a TEXT frame
 vws_frame_send_text(cnx, "SET auth t=kiwi p=");
 usleep(100000);
-vws_frame_send_text(cnx,"SET zoom=7 cf=5505");
+vws_frame_send_text(cnx,"SET zoom=4 cf=5505");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
 usleep(100000);
-vws_frame_send_text(cnx,"SET wf_speed=2");
+vws_frame_send_text(cnx,"SET wf_speed=1");
 usleep(100000);
 vws_frame_send_text(cnx,"SET wf_comp=0");
 usleep(100000);
@@ -73,9 +75,9 @@ printf(" Line %d \n",__LINE__);
 debug = 0;
 watch_dog=0;    
 
-//ret=pthread_create(&callback_id,NULL, (void *) server_callback,NULL);
+//ret=pthread_create(&callback_id,NULL, (void *) read_kiwi_line,NULL);
 
-/*
+
 while(1)
     {   
    vws_msg* reply = vws_msg_recv(cnx);
@@ -104,22 +106,26 @@ while(1)
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
         //draw_trace_fft();
         
-    printf(" LOOPIN RXD %d \n",debug++);
+    //printf(" LOOPIN RXD %d \n",debug++);
 	}
 	
     }   
-    * */ 
+
 }
 
 
 
-void read_kiwi_line()
+void * xxread_kiwi_line()
     {   
+while(1)
+  {
    vws_msg* reply = vws_msg_recv(cnx);
+
 
     if (reply == NULL)
         {
-        printf(" No Message  recd. Line: %d \n",__LINE__);
+int z=z;
+       // printf(" No Message  recd. Line: %d \n",__LINE__);
         // There was no message received and it resulted in timeout
         }
     else
@@ -143,29 +149,8 @@ void read_kiwi_line()
         
     printf("Kiwi-line %d ",debug++);
 	}
-	
+  }	
  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

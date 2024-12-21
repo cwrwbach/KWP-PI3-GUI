@@ -20,22 +20,16 @@
 #include "waterfall.h"
 
 #define FFT_SIZE 1024
-
 #define FRAME_BUF_WIDTH 1366
 #define FRAME_BUF_HEIGHT 768
-
 #define SCOPE_WIDTH 1366
 #define SCOPE_HEIGHT 400
-
 #define WFALL_WIDTH 800
 #define WFALL_HEIGHT 200
 
-#define BTN_WIDTH 70
-#define BTN_HEIGHT 70
-
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
-int fbfd; // framebuffer file descriptor
+int fbfd;
 
 long int screensize ;
 int8_t kiwi_buf[FFT_SIZE];
@@ -50,6 +44,9 @@ uint16_t * scope_buf;
 uint16_t * wfall_buf;
 uint16_t * btn_buf[10];
 
+void * setup_kiwi();
+//void read_kiwi_line();
+pthread_t callback_id;
 //================
 
 void draw_grid()
@@ -59,10 +56,7 @@ int n_horiz;
 int n_verts;
 int h_gap,v_gap;
 
-
 plot_filled_rectangle(scope_buf, 0, 0,SCOPE_WIDTH, SCOPE_HEIGHT, C_DARK_GREEN);
-
-
 
 n_horiz=6;
 n_verts = 12;
@@ -181,57 +175,6 @@ for(long pppp=0;pppp<(screen_size_x*screen_size_y);pppp++)
 }
 //=========
 
-
-void main_was_good()
-{
-unsigned int red,green,blue;
-short rgba;
-int screenbytes;
-int quit_request;
-int err;
-int moop;
-__u32 dummy = 0;
-
-fbfd = open("/dev/fb0", O_RDWR); // Open the framebuffer device file for reading and writing
-if (fbfd == -1) 
-    printf("Error: cannot open framebuffer device.\n");
- 
-if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo)) // Get variable screen information
-	    printf("Error reading variable screen info.\n");
-printf("Display info %dx%d, %d bpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel );
-
-screen_size_x = vinfo.xres;
-screen_size_y = vinfo.yres;
-bytes_pp = vinfo.bits_per_pixel/8;
-
-int fb_data_size = screen_size_x * screen_size_y * bytes_pp;
-printf (" FB data size = %d \n",fb_data_size);
-
-
-
-// map framebuffer to user memory 
-frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
-
-while(1) {printf(" LINE %d \n",__LINE__);sleep(1);}
-
-clear_mable(C_GRAY);
-
-
-
-for(int x=171;x<1024+171;x++)
-    {
-    set_pixel(frame_buf,x,200,C_RED);
-    }
-
-
-
-
-}
-
-
-
-//==========
-
 void main()
 {
 unsigned int red,green,blue;
@@ -260,49 +203,36 @@ printf (" FB data size = %d \n",fb_data_size);
 scope_buf = malloc(SCOPE_WIDTH*SCOPE_HEIGHT*bytes_pp);
 wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*bytes_pp);
 
-for(int b=0;b<10;b++)
-    btn_buf[b] = malloc(BTN_WIDTH*BTN_HEIGHT*bytes_pp);
-
 // map framebuffer to user memory 
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
-clear_mable(C_GRAY);
-//clear_screen(rgb565(0,120,0));
+clear_screen(rgb565(0,0,40));
 
-//for(int b=0;b<10;b++)
-//    {
-//    plot_filled_rectangle(frame_buf,5+(b*80),390,BTN_WIDTH,BTN_HEIGHT,C_DARK_GREEN);
-//    }
+plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
 
-plot_large_string(frame_buf,320,300,"WAITING FOR KIWI",C_WHITE);
+int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
+
+printf(" SETUP ==========================  \n");
+
 //setup_kiwi();
-
-//Maybe start another thread here:
-//ret=pthread_create(&callback_id,NULL, (void *) server_callback,NULL);
-printf(" DONE intro\n");
-//Main Loop
-moop=0;
 
 //while(1) {printf(" LINE %d \n",__LINE__);sleep(1);}
 
 while(1)
     {
-    draw_waterfall();    
-   draw_spectrum();      
+    //draw_waterfall();    
+    //draw_spectrum();      
              
     err= ioctl(fbfd, FBIO_WAITFORVSYNC, &dummy); // Wait for frame sync
     copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
    // read_kiwi_line();
    
+printf(" FAB \n");
+sleep(2);
 
-   //draw_grid();
+   draw_grid();
     //printf("Main: %d : %d",moop++,__LINE__) ;   
     }
-
-//plot_line(frame_buf,0,200,400,200,C_WHITE);
-//plot_line(scope_buf,400,0,400,300,C_RED);
-
-
 
 copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 
