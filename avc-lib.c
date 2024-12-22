@@ -38,6 +38,7 @@ for(int p=0;p<(screen_size_x*screen_size_y);p++)
     frame_buf[p] = pixval;
 }
 
+/*
 short rgb565(short red,short green,short blue)
 {
 short colour= 0;
@@ -46,6 +47,18 @@ colour = colour | (green & 0x3f) <<6;
 colour = colour | blue & 0x1f;
 return colour;
 }
+*/
+
+short rgb565(short red,short green,short blue)
+{
+short colour= 0;
+colour = (red & 0xf8) <<8;
+colour = colour | ((green & 0xfc) <<3);
+colour = colour | (blue >>3);
+return colour;
+}
+
+
 
 void plot_line (uint16_t * buf,int x0, int y0, int x1, int y1,uint16_t colour)
 {

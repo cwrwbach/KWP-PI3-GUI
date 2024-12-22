@@ -18,6 +18,7 @@
 #include "avc-lib.h"
 #include "avc-colours.h"
 #include "waterfall.h"
+#include "qt_jet.h"
 
 #define FFT_SIZE 1024
 #define FRAME_BUF_WIDTH 1366
@@ -130,28 +131,41 @@ wf_ln++;
 if(wf_ln > WFALL_HEIGHT)
     wf_ln = 1;
 
+uint8_t xxx = 0;
+
+printf(" \n \n");
 //Draw first line of waterfall
 for(point=0;point<1024;point++) //FFT SIZE
     {
-    inx = 255-(kiwi_buf[point]); //adjusted to central 800 points !!! FIXME
-    inx = -1 * (kiwi_buf[point]); //adjusted to central 800 points !!! FIXME
+
+   
+    inx = (int) 110+(kiwi_buf[point]); //adjusted to central 800 points !!! FIXME
+    //inx = -1 * (kiwi_buf[point] + 100); //adjusted to central 800 points !!! FIXME
     //printf(" VP %d \n",fft_video_buf[point]);
-    printf(" >> %d \n",inx);
-    inx =  point / 4; //inx +20;
+    //printf(" %d \n",inx);
+       
+    //inx =  point/4; //inx +20;
     qt_jet(inx);
 
-    red = (uint16_t) qtj[0];
-    green=(uint16_t) qtj[1];
-    blue =(uint16_t) qtj[2];
-    red = red<<16;
-    green = green <<8;
-
-    colour = red ;
-    colour = colour | blue ;
-    colour = colour | green;
+    red = (uint16_t) jet_col[inx][0]; //qtj[0];
+    green=(uint16_t) jet_col[inx][1]; //qtj[1];
+    blue =(uint16_t) jet_col[inx][2]; //qtj[2];
+    //red = red<<16;
+    //green = green <<8;
+//printf("xxx %d \n");
+    //colour = rgb565(red/8,green/8,blue/8);
+    colour = rgb565(red,green,blue);
+    xxx++;
+    //colour = red ;
+    //colour = colour | blue ;
+    //colour = colour | green;
     set_pixel(wfall_buf,point , 0, colour);
     }
+//copy_surface_to_image(wfall_buf,0,150,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 
+//for(int b=0;b<1024;b++)
+ //   printf(" %d",wfall_buf[b]);
+//printf(" \n");
 
 //Scroll all lines down, starting from the bottom
     for(int ll = WFALL_HEIGHT; ll >=0 ; ll--)
@@ -213,7 +227,7 @@ printf(" SETUP ==========================  \n");
 while(1)
     {
     printf(" FAB \n");
-    sleep(2);
+   // sleep(2);
 
    //draw_grid();
     //printf("Main: %d : %d",moop++,__LINE__) ;   
