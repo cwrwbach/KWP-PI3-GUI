@@ -100,7 +100,7 @@ assert(vws_socket_is_connected((vws_socket*)cnx) == true);
 // Send a TEXT frame
 vws_frame_send_text(cnx, "SET auth t=kiwi p=");
 usleep(100000);
-vws_frame_send_text(cnx,"SET zoom=8 cf=10100");
+vws_frame_send_text(cnx,"SET zoom=5 cf=11805");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
 usleep(100000);
@@ -143,8 +143,8 @@ while(1)
         vws_msg_free(reply);   
         
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
-        //draw_trace_fft();
-        draw_waterfall();      
+        draw_spectrum();
+       // draw_waterfall();      
     //printf(" LOOPIN RXD %d \n",debug++);
         }
 	

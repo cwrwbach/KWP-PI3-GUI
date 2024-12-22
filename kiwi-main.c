@@ -92,25 +92,27 @@ int fft_buf[FFT_SIZE];
 bins_n = 1024;
 int8_t tmp;
 
-#define BASE_LINE 120
+#define BASE_LINE 110
 
 for(int k = 0; k < FFT_SIZE; k++)
 {
 if(kiwi_buf[k] > -30) kiwi_buf[k] = -100;    //odd spikes! WHY ??? FIXME
 fft_buf[k] =  kiwi_buf[k] * -1; 
 //printf(" k=%d kk=%d kb=%d \n",k,kiwi_buf[k],fft_buf[k]);
-}   
+} 
+
+draw_grid();  
     
 //Plot only the selected central segment of 800 bins.
 nv=0;
-for(int n = 0; n<800; n++)
+for(int n = 0; n<FFT_SIZE; n++)
     {
-    val= fft_buf[112+n];
-    plot_line(scope_buf, nv, BASE_LINE , nv, val, C_MAGENTA);
+    val= fft_buf[n];
+    plot_line(scope_buf, nv, BASE_LINE , nv, val, C_WHITE);
     nv++;
     }
     
-    //copy_surface_to_image(scope_buf,0,150,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+    copy_surface_to_image(scope_buf,0,150,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
 //=========
@@ -226,7 +228,7 @@ printf(" SETUP ==========================  \n");
 
 while(1)
     {
-    printf(" FAB \n");
+ //   printf(" FAB \n");
    // sleep(2);
 
    //draw_grid();
