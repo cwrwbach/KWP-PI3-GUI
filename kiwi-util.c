@@ -157,7 +157,7 @@ for(int i = 0; i< 1024;i++)
     fft_buf[i] = 117 + kiwi_buf[i]+2;
     }
         draw_spectrum(C_WHITE);
-       // draw_waterfall();      
+        draw_waterfall();      
     //printf(" LOOPIN RXD %d \n",debug++);
         }
 	

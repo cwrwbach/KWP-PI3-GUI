@@ -27,7 +27,7 @@
 #define SPEC_HEIGHT 150
 #define SPEC_BASE_LINE 125
 #define WFALL_WIDTH 1366
-#define WFALL_HEIGHT 600
+#define WFALL_HEIGHT 400
 
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
@@ -129,9 +129,10 @@ printf(" \n \n");
 //Draw first line of waterfall
 for(point=0;point<1024;point++) //FFT SIZE
     {
-
+    //fiddle with thresholds here - just poking ??? *** ???
+    if(kiwi_buf[point] < -80) kiwi_buf[point] = -130;
    
-    inx = (int) 110+(kiwi_buf[point]); //adjusted to central 800 points !!! FIXME
+    inx = (int) 200+(kiwi_buf[point]); //adjusted to central 800 points !!! FIXME
     //inx = -1 * (kiwi_buf[point] + 100); //adjusted to central 800 points !!! FIXME
     //printf(" VP %d \n",fft_video_buf[point]);
     //printf(" %d \n",inx);
@@ -168,7 +169,7 @@ for(point=0;point<1024;point++) //FFT SIZE
         }
     }
     
-copy_surface_to_image(wfall_buf,0,150,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+copy_surface_to_image(wfall_buf,100,200,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
 //======
