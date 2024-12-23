@@ -13,21 +13,20 @@
 
 extern char kiwi_buf[FFT_SIZE];
 bool stream_flag;
-
 vws_cnx* cnx;
 int debug;
 int watch_dog;
-
 extern int fft_buf[FFT_SIZE];
-
 extern uint8_t qtj[3];
 void * read_kiwi_line();
 extern pthread_t callback_id;
+void draw_spectrum(short);
+void draw_waterfall();
+
 //============================
 
 int qt_jet(int i)
 {        
-        
 uint8_t col[3] = {255,255,255};
 //uint8_t shade[3] = {255,255,255} ;  
   
@@ -94,7 +93,7 @@ assert(vws_socket_is_connected((vws_socket*)cnx) == true);
 // Send a TEXT frame
 vws_frame_send_text(cnx, "SET auth t=kiwi p=");
 usleep(100000);
-vws_frame_send_text(cnx,"SET zoom=2 cf=17586");
+vws_frame_send_text(cnx,"SET zoom=4 cf=17586");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
 usleep(100000);
