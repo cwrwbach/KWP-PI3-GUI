@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <math.h>
 #include <vws/websocket.h>
+#include "avc-colours.h"
 
 #define FFT_SIZE 1024
 #define PAK_LEN 1280
@@ -17,6 +18,7 @@ vws_cnx* cnx;
 int debug;
 int watch_dog;
 
+extern int fft_buf[FFT_SIZE];
 
 extern uint8_t qtj[3];
 void * read_kiwi_line();
@@ -100,7 +102,7 @@ assert(vws_socket_is_connected((vws_socket*)cnx) == true);
 // Send a TEXT frame
 vws_frame_send_text(cnx, "SET auth t=kiwi p=");
 usleep(100000);
-vws_frame_send_text(cnx,"SET zoom=5 cf=11805");
+vws_frame_send_text(cnx,"SET zoom=2 cf=17586");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
 usleep(100000);
@@ -143,7 +145,18 @@ while(1)
         vws_msg_free(reply);   
         
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
-        draw_spectrum();
+
+
+for(int i = 0; i< 1024;i++)
+    {
+    //if(kiwi_buf[i] > 0) printf(" Too BIG %d %d\n",i,kiwi_buf[i]);
+    
+    //if(kiwi_buf[i] < -100) printf(" Too SMALL %d \n",kiwi_buf[i]);
+    
+
+    fft_buf[i] = 117 + kiwi_buf[i]+2;
+    }
+        draw_spectrum(C_WHITE);
        // draw_waterfall();      
     //printf(" LOOPIN RXD %d \n",debug++);
         }

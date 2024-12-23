@@ -23,8 +23,9 @@
 #define FFT_SIZE 1024
 #define FRAME_BUF_WIDTH 1366
 #define FRAME_BUF_HEIGHT 768
-#define SCOPE_WIDTH 1366
-#define SCOPE_HEIGHT 400
+#define SPEC_WIDTH 1366
+#define SPEC_HEIGHT 150
+#define SPEC_BASE_LINE 125
 #define WFALL_WIDTH 1366
 #define WFALL_HEIGHT 600
 
@@ -41,8 +42,10 @@ uint bytes_pp;
 uint status_pos;
 
 uint16_t * frame_buf;
-uint16_t * scope_buf;
+uint16_t * spec_buf;
 uint16_t * wfall_buf;
+
+int fft_buf[FFT_SIZE];
 
 uint8_t qtj[3];
 
@@ -58,61 +61,48 @@ int n_horiz;
 int n_verts;
 int h_gap,v_gap;
 
-plot_filled_rectangle(scope_buf, 0, 0,SCOPE_WIDTH, SCOPE_HEIGHT, C_DARK_GREEN);
+//plot_filled_rectangle(spec_buf, 0, 0, SPEC_HEIGHT-5, C_DARK_GREEN);
 
 n_horiz=6;
-n_verts = 12;
 
-v_gap = SCOPE_WIDTH/(n_verts-2);
-h_gap = SCOPE_HEIGHT/(n_horiz);
+
+//n_verts = 3;
+//v_gap = SPEC_WIDTH/(n_verts-2);
+h_gap = SPEC_HEIGHT/(n_horiz);
 
 for(i=1;i<n_horiz;i++)
-    plot_dotted_line(scope_buf,0,i*h_gap,SCOPE_WIDTH,i*h_gap,C_YELLOW);//YELLOW);
+    plot_dotted_line(spec_buf,0,i*h_gap,SPEC_WIDTH,i*h_gap,C_YELLOW);//YELLOW);
+/*
+//for(i=1;i<n_verts-2;i++)
+//    plot_dotted_line(spec_buf,i*v_gap,0,i*v_gap,SPEC_HEIGHT-5,C_YELLOW);//);
+*/
 
-for(i=1;i<n_verts-2;i++)
-    plot_dotted_line(scope_buf,i*v_gap,0,i*v_gap,SCOPE_HEIGHT,C_YELLOW);//);
-
-
-
-//plot_line(scope_buf,400,0,400,300,C_RED);
-//plot_rectangle(scope_buf,0,0,SCOPE_WIDTH-4,SCOPE_HEIGHT-4,C_BLUE);
 }
 
 //------------------
 
-void draw_spectrum()
+void draw_spectrum(short colour)
 {
-int bins_n;
-int val;
+short val;
+int spec_base;
 int nv;
-nv=0;
 
-int fft_buf[FFT_SIZE];
+spec_base = SPEC_BASE_LINE;
 
-bins_n = 1024;
-int8_t tmp;
+//fill backround of SPEC
+for(int b=0;b<SPEC_HEIGHT * SPEC_WIDTH;b++)
+    spec_buf[b] = 0x0004;
 
-#define BASE_LINE 110
-
-for(int k = 0; k < FFT_SIZE; k++)
-{
-if(kiwi_buf[k] > -30) kiwi_buf[k] = -100;    //odd spikes! WHY ??? FIXME
-fft_buf[k] =  kiwi_buf[k] * -1; 
-//printf(" k=%d kk=%d kb=%d \n",k,kiwi_buf[k],fft_buf[k]);
-} 
-
-draw_grid();  
+draw_grid();
     
-//Plot only the selected central segment of 800 bins.
-nv=0;
-for(int n = 0; n<FFT_SIZE; n++)
+nv=100; //horiz od=ffset
+for(int n = 0; n < FFT_SIZE; n++)
     {
-    val= fft_buf[n];
-    plot_line(scope_buf, nv, BASE_LINE , nv, val, C_WHITE);
+    val= fft_buf[n] & 0x007f; //max 127
+    plot_line(spec_buf, nv,spec_base , nv,spec_base - val,colour);
     nv++;
     }
-    
-    copy_surface_to_image(scope_buf,0,150,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+copy_surface_to_image(spec_buf,0,50,SPEC_WIDTH,SPEC_HEIGHT);
 }
 
 //=========
@@ -208,7 +198,7 @@ bytes_pp = vinfo.bits_per_pixel/8;
 int fb_data_size = screen_size_x * screen_size_y * bytes_pp;
 printf (" FB data size = %d \n",fb_data_size);
 
-scope_buf = malloc(SCOPE_WIDTH*SCOPE_HEIGHT*bytes_pp);
+spec_buf = malloc(SPEC_WIDTH*SPEC_HEIGHT*bytes_pp);
 wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*bytes_pp);
 
 // map framebuffer to user memory 
@@ -235,7 +225,7 @@ while(1)
     //printf("Main: %d : %d",moop++,__LINE__) ;   
     }
 
-//copy_surface_to_image(scope_buf,0,0,SCOPE_WIDTH,SCOPE_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+//copy_surface_to_image(scope_buf,0,0,SPEC_WIDTH,SPEC_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 
 printf(" Debug at %d\n",__LINE__);
 sleep(1);
