@@ -105,7 +105,6 @@ wf_ln++;
 if(wf_ln > WFALL_HEIGHT)
     wf_ln = 1;
 
-printf(" \n \n");
 //Draw first line of waterfall
 for(point=0;point<1024;point++) //FFT SIZE
     {
