@@ -1,20 +1,13 @@
-#include <linux/input.h>
-#include <string.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <signal.h>
 #include <pthread.h>
-#include <locale.h>
 #include <sys/ioctl.h>
-#include <linux/kd.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <time.h>
 #include <inttypes.h>
 #include <math.h>
-
 #include "avc-lib.h"
 #include "avc-colours.h"
 #include "waterfall.h"
@@ -35,22 +28,17 @@ int fbfd;
 
 long int screensize ;
 int8_t kiwi_buf[FFT_SIZE];
-
 uint screen_size_x;
 uint screen_size_y;
 uint bytes_pp;
 uint status_pos;
-
 uint16_t * frame_buf;
 uint16_t * spec_buf;
 uint16_t * wfall_buf;
-
 int fft_buf[FFT_SIZE];
 
 uint8_t qtj[3];
-
 void * setup_kiwi();
-//void read_kiwi_line();
 pthread_t callback_id;
 //================
 
@@ -61,22 +49,16 @@ int n_horiz;
 int n_verts;
 int h_gap,v_gap;
 
-//plot_filled_rectangle(spec_buf, 0, 0, SPEC_HEIGHT-5, C_DARK_GREEN);
-
 n_horiz=6;
-
-
+h_gap = SPEC_HEIGHT/(n_horiz);
 //n_verts = 3;
 //v_gap = SPEC_WIDTH/(n_verts-2);
-h_gap = SPEC_HEIGHT/(n_horiz);
 
 for(i=1;i<n_horiz;i++)
     plot_dotted_line(spec_buf,0,i*h_gap,SPEC_WIDTH,i*h_gap,C_YELLOW);//YELLOW);
-/*
+
 //for(i=1;i<n_verts-2;i++)
 //    plot_dotted_line(spec_buf,i*v_gap,0,i*v_gap,SPEC_HEIGHT-5,C_YELLOW);//);
-*/
-
 }
 
 //------------------
@@ -95,7 +77,7 @@ for(int b=0;b<SPEC_HEIGHT * SPEC_WIDTH;b++)
 
 draw_grid();
     
-nv=100; //horiz od=ffset
+nv=100; //horiz offset
 for(int n = 0; n < FFT_SIZE; n++)
     {
     val= fft_buf[n] & 0x007f; //max 127
@@ -123,8 +105,6 @@ wf_ln++;
 if(wf_ln > WFALL_HEIGHT)
     wf_ln = 1;
 
-uint8_t xxx = 0;
-
 printf(" \n \n");
 //Draw first line of waterfall
 for(point=0;point<1024;point++) //FFT SIZE
@@ -132,33 +112,16 @@ for(point=0;point<1024;point++) //FFT SIZE
     //fiddle with thresholds here - just poking ??? *** ???
     if(kiwi_buf[point] < -80) kiwi_buf[point] = -130;
    
-    inx = (int) 200+(kiwi_buf[point]); //adjusted to central 800 points !!! FIXME
-    //inx = -1 * (kiwi_buf[point] + 100); //adjusted to central 800 points !!! FIXME
-    //printf(" VP %d \n",fft_video_buf[point]);
-    //printf(" %d \n",inx);
+    inx = (int) 200+(kiwi_buf[point]); //adjusted to central
        
-    //inx =  point/4; //inx +20;
-    qt_jet(inx);
+    qt_jet(inx); //look-up colour
 
     red = (uint16_t) jet_col[inx][0]; //qtj[0];
     green=(uint16_t) jet_col[inx][1]; //qtj[1];
     blue =(uint16_t) jet_col[inx][2]; //qtj[2];
-    //red = red<<16;
-    //green = green <<8;
-//printf("xxx %d \n");
-    //colour = rgb565(red/8,green/8,blue/8);
     colour = rgb565(red,green,blue);
-    xxx++;
-    //colour = red ;
-    //colour = colour | blue ;
-    //colour = colour | green;
     set_pixel(wfall_buf,point , 0, colour);
     }
-//copy_surface_to_image(wfall_buf,0,150,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
-
-//for(int b=0;b<1024;b++)
- //   printf(" %d",wfall_buf[b]);
-//printf(" \n");
 
 //Scroll all lines down, starting from the bottom
     for(int ll = WFALL_HEIGHT; ll >=0 ; ll--)
@@ -168,7 +131,6 @@ for(point=0;point<1024;point++) //FFT SIZE
         wfall_buf[((ll+1)*WFALL_WIDTH)+WFALL_WIDTH+pp] = wfall_buf[((ll)* WFALL_WIDTH)+pp];
         }
     }
-    
 copy_surface_to_image(wfall_buf,100,200,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
@@ -206,27 +168,17 @@ wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*bytes_pp);
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
 clear_screen(rgb565(0,3,0));
-
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
 
 int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
 
 printf(" SETUP ==========================  \n");
 
-//setup_kiwi();
-
-//while(1) {printf(" LINE %d \n",__LINE__);sleep(1);}
-
 while(1)
     {
- //   printf(" FAB \n");
-   // sleep(2);
-
-   //draw_grid();
-    //printf("Main: %d : %d",moop++,__LINE__) ;   
+    //waiting for C2C commands etc.
+    sleep(1);
     }
-
-//copy_surface_to_image(scope_buf,0,0,SPEC_WIDTH,SPEC_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 
 printf(" Debug at %d\n",__LINE__);
 sleep(1);

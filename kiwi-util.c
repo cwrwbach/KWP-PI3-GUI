@@ -25,10 +25,8 @@ void * read_kiwi_line();
 extern pthread_t callback_id;
 //============================
 
-
 int qt_jet(int i)
 {        
-
         
 uint8_t col[3] = {255,255,255};
 //uint8_t shade[3] = {255,255,255} ;  
@@ -61,7 +59,6 @@ uint8_t col[3] = {255,255,255};
  qtj[2] = col[2]; 
 }
 
-
 void  * setup_kiwi()
 {
 cnx = vws_cnx_new();    
@@ -70,14 +67,9 @@ char uri_string[256];
 int ret;
 char fft_video_buf[1536];
 
-printf(" LINE %d \n",__LINE__);
-
 // Set connection timeout to 5 seconds (the default is 10). This applies
 // both to connect() and to read operations (i.e. poll()).
 vws_socket_set_timeout((vws_socket*)cnx, 5);
-
-printf(" LINE %d \n",__LINE__);
-
 time_t utc_now = time( NULL );
 printf(" utc %d \n" , utc_now);
 
@@ -117,7 +109,7 @@ debug = 0;
 watch_dog=0;    
 
 //ret=pthread_create(&callback_id,NULL, (void *) read_kiwi_line,NULL);
-
+//---
 
 while(1)
     {   
@@ -140,117 +132,17 @@ while(1)
 
         for(int i = 0; i< 1024;i++)
             {
-              kiwi_buf[i] = reply->data->data[i]; //signed dB
-            }
-        vws_msg_free(reply);   
-        
-        stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
-
-
-for(int i = 0; i< 1024;i++)
-    {
-    //if(kiwi_buf[i] > 0) printf(" Too BIG %d %d\n",i,kiwi_buf[i]);
-    
-    //if(kiwi_buf[i] < -100) printf(" Too SMALL %d \n",kiwi_buf[i]);
-    
-
-    fft_buf[i] = 117 + kiwi_buf[i]+2;
-    }
-        draw_spectrum(C_WHITE);
-        draw_waterfall();      
-    //printf(" LOOPIN RXD %d \n",debug++);
-        }
-	
-    }   
-
-}
-
-
-
-void * xxread_kiwi_line()
-    {   
-while(1)
-  {
-   vws_msg* reply = vws_msg_recv(cnx);
-
-
-    if (reply == NULL)
-        {
-int z=z;
-       // printf(" No Message  recd. Line: %d \n",__LINE__);
-        // There was no message received and it resulted in timeout
-        }
-    else
-        {
-        // Free message
-        printf(" Rxd: %d \n",debug++);
-        if(watch_dog++ > 30)
-            {
-            watch_dog = 0;
-            vws_frame_send_text(cnx,"SET keepalive");
-            }
-
-        for(int i = 0; i< FFT_SIZE ;i++)
-            {
             kiwi_buf[i] = reply->data->data[i]; //signed dB
             }
         vws_msg_free(reply);   
-        
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
-        //draw_trace_fft();
-        
-    printf("Kiwi-line %d ",debug++);
-	}
-  }	
- }
 
-
-
-
-
-
-/*
-void * server_callback(void)
-{
-    
-int i;
-unsigned int fft_count;
-int rxd_pak_len;
-float audio;
-int rbi;
-static int local_count;
-int rxd_count;
-char id_type;
-char temp_audio[1024];
-   
-//return;   
-   
+        for(int i = 0; i< 1024;i++)
+            {
+            fft_buf[i] = 117 + kiwi_buf[i]+2;
+            }
+        draw_spectrum(C_WHITE);
+        draw_waterfall();      
+        }
+    }   
 }
-*/
-
-//---
-/*
-void start_server_stream()
-{
-pthread_t callback_id;
-int err;
-//int num_stages;
-int ret;
-//int  freq;
-
-
-//setup_network();
-printf(" Network started \n");
-usleep(10000);	
-
-//Create a callback thread
-ret=pthread_create(&callback_id,NULL, (void *) server_callback,NULL);
-
-
-if(ret==0)
-	printf("Network Thread created successfully.\n");
-else
-	printf("NW Thread not created.\n");
-}
-
-*/
