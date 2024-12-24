@@ -16,7 +16,7 @@ bool stream_flag;
 vws_cnx* cnx;
 int debug;
 int watch_dog;
-extern int fft_buf[FFT_SIZE];
+extern uint8_t fft_buf[FFT_SIZE];
 extern uint8_t qtj[3];
 void * read_kiwi_line();
 extern pthread_t callback_id;
@@ -110,6 +110,9 @@ watch_dog=0;
 //ret=pthread_create(&callback_id,NULL, (void *) read_kiwi_line,NULL);
 //---
 
+int8_t tryit;
+int help;
+
 while(1)
     {   
     vws_msg* reply = vws_msg_recv(cnx);
@@ -131,21 +134,34 @@ while(1)
 
         for(int i = 0; i< 1024;i++)
             {
-            kiwi_buf[i] = (int8_t) reply->data->data[i]; //signed dB
+            tryit = reply->data->data[i]; 
+     if(tryit > 0) tryit = 0;       
+//printf(" > :%d",tryit);
+
+            kiwi_buf[i] = ((int) reply->data->data[i]); //signed dB
+//printf(" > :%d",kiwi_buf[i]);
             }
         vws_msg_free(reply);   
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
 
         for(int i = 0; i< 1024;i++)
             {
-            //printf("#%d ", kiwi_buf[i]);
-            
-            fft_buf[i] = 127 + (int) (kiwi_buf[i]);
+//printf("#%d ", kiwi_buf[i]);
+            help = (int) kiwi_buf[i];
+            help = 127 +help;
+printf("#%d ",help);
+
+if(help > 125) help = 125;
+            fft_buf[i] = ( int8_t )help ; //20 ; (uint8_t) help; //120 + kiwi_buf[i];
+
+
+
+
             //if(fft_buf[i]  <3) fft_buf[i] = 30;
             //printf("$%d #%d ",fft_buf[i], kiwi_buf[i]);
             }
         draw_spectrum(C_WHITE);
-        draw_waterfall();      
+        //draw_waterfall();      
         }
     }   
 }

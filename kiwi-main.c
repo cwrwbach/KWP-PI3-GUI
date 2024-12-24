@@ -36,7 +36,7 @@ uint status_pos;
 uint16_t * frame_buf;
 uint16_t * spec_buf;
 uint16_t * wfall_buf;
-int fft_buf[FFT_SIZE];
+int8_t fft_buf[FFT_SIZE];
 
 uint8_t qtj[3];
 void * setup_kiwi();
@@ -72,7 +72,7 @@ void draw_spectrum(short colour)
 {
 int val;
 int spec_base;
-int voff;
+int xpos;
 spec_base = SPEC_BASE_LINE;
 
 //fill backround of SPEC
@@ -95,15 +95,15 @@ fft_buf[264] = 200;
 fft_buf[265] = 200;
 */
 
-voff = (screen_size_x - FFT_SIZE)/2;  //offset to centre
+xpos = (screen_size_x - FFT_SIZE)/2;  //offset to centre
 //nv=100; //horiz offset
 for(int n = 0; n < FFT_SIZE; n++)
     {
     val= fft_buf[n];
     if (val > 100 || val < 0) 
         printf(" Val error at %d \n", val);
-    plot_line(spec_buf,voff,spec_base , voff,spec_base - val,colour);
-    voff++;
+    plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour);
+    xpos++;
     }
 copy_surface_to_image(spec_buf,0,6,SPEC_WIDTH,SPEC_HEIGHT);
 }
@@ -118,7 +118,7 @@ unsigned char fft_val;
 int loc_x,loc_y;
 unsigned int wf_ln;
 int inx;
-int voff;
+int xpos;
 
 loc_x = 10;
 loc_y = 10;
@@ -131,7 +131,7 @@ if(wf_ln > WFALL_HEIGHT)
 for(point=0;point<1024;point++) //FFT SIZE
     {
     //fiddle with thresholds here - just poking ??? *** ???
-    if(kiwi_buf[point] < -80) kiwi_buf[point] = -130;
+    //if(kiwi_buf[point] < -80) kiwi_buf[point] = -130;
    
     inx = (int) 200+(kiwi_buf[point]); //adjusted to central
        
@@ -152,8 +152,8 @@ for(point=0;point<1024;point++) //FFT SIZE
         wfall_buf[((ll+1)*WFALL_WIDTH)+WFALL_WIDTH+pp] = wfall_buf[((ll)* WFALL_WIDTH)+pp];
         }
     }
-voff = (screen_size_x - FFT_SIZE)/2;  //offset to centre
-copy_surface_to_image(wfall_buf,voff,270,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+xpos = (screen_size_x - FFT_SIZE)/2;  //offset to centre
+copy_surface_to_image(wfall_buf,xpos,270,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
 //======
