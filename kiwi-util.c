@@ -11,7 +11,7 @@
 #define PAK_LEN 1280
 #define HEADER_LEN 256
 
-extern char kiwi_buf[FFT_SIZE];
+extern int8_t kiwi_buf[FFT_SIZE];
 bool stream_flag;
 vws_cnx* cnx;
 int debug;
@@ -97,7 +97,7 @@ vws_frame_send_text(cnx,"SET zoom=4 cf=17586");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
 usleep(100000);
-vws_frame_send_text(cnx,"SET wf_speed=2");
+vws_frame_send_text(cnx,"SET wf_speed=1");
 usleep(100000);
 vws_frame_send_text(cnx,"SET wf_comp=0");
 usleep(100000);
@@ -131,14 +131,18 @@ while(1)
 
         for(int i = 0; i< 1024;i++)
             {
-            kiwi_buf[i] = reply->data->data[i]; //signed dB
+            kiwi_buf[i] = (int8_t) reply->data->data[i]; //signed dB
             }
         vws_msg_free(reply);   
         stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
 
         for(int i = 0; i< 1024;i++)
             {
-            fft_buf[i] = 117 + kiwi_buf[i]+2;
+            //printf("#%d ", kiwi_buf[i]);
+            
+            fft_buf[i] = 127 + (int) (kiwi_buf[i]);
+            //if(fft_buf[i]  <3) fft_buf[i] = 30;
+            //printf("$%d #%d ",fft_buf[i], kiwi_buf[i]);
             }
         draw_spectrum(C_WHITE);
         draw_waterfall();      

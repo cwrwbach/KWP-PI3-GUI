@@ -18,8 +18,8 @@
 #define FRAME_BUF_WIDTH 1366
 #define FRAME_BUF_HEIGHT 768
 #define SPEC_WIDTH 1366
-#define SPEC_HEIGHT 150
-#define SPEC_BASE_LINE 125
+#define SPEC_HEIGHT 256
+#define SPEC_BASE_LINE 255
 #define WFALL_WIDTH 1366
 #define WFALL_HEIGHT 500
 
@@ -54,7 +54,7 @@ int n_horiz;
 int n_verts;
 int h_gap,v_gap;
 
-n_horiz=6;
+n_horiz=5;
 h_gap = SPEC_HEIGHT/(n_horiz);
 //n_verts = 3;
 //v_gap = SPEC_WIDTH/(n_verts-2);
@@ -70,10 +70,9 @@ for(i=1;i<n_horiz;i++)
 
 void draw_spectrum(short colour)
 {
-short val;
+int val;
 int spec_base;
-int nv;
-
+int voff;
 spec_base = SPEC_BASE_LINE;
 
 //fill backround of SPEC
@@ -81,15 +80,32 @@ for(int b=0;b<SPEC_HEIGHT * SPEC_WIDTH;b++)
     spec_buf[b] = 0x0004;
 
 draw_grid();
-    
-nv=100; //horiz offset
+
+//Test values
+/* 
 for(int n = 0; n < FFT_SIZE; n++)
     {
-    val= fft_buf[n] & 0x007f; //max 127
-    plot_line(spec_buf, nv,spec_base , nv,spec_base - val,colour);
-    nv++;
+    fft_buf[n]=0;
     }
-copy_surface_to_image(spec_buf,0,50,SPEC_WIDTH,SPEC_HEIGHT);
+fft_buf[256] = 100;
+fft_buf[257] = 100;
+fft_buf[260] = 150;
+fft_buf[261] = 150;
+fft_buf[264] = 200;
+fft_buf[265] = 200;
+*/
+
+voff = (screen_size_x - FFT_SIZE)/2;  //offset to centre
+//nv=100; //horiz offset
+for(int n = 0; n < FFT_SIZE; n++)
+    {
+    val= fft_buf[n];
+    if (val > 100 || val < 0) 
+        printf(" Val error at %d \n", val);
+    plot_line(spec_buf,voff,spec_base , voff,spec_base - val,colour);
+    voff++;
+    }
+copy_surface_to_image(spec_buf,0,6,SPEC_WIDTH,SPEC_HEIGHT);
 }
 
 //=========
@@ -102,6 +118,7 @@ unsigned char fft_val;
 int loc_x,loc_y;
 unsigned int wf_ln;
 int inx;
+int voff;
 
 loc_x = 10;
 loc_y = 10;
@@ -135,7 +152,8 @@ for(point=0;point<1024;point++) //FFT SIZE
         wfall_buf[((ll+1)*WFALL_WIDTH)+WFALL_WIDTH+pp] = wfall_buf[((ll)* WFALL_WIDTH)+pp];
         }
     }
-copy_surface_to_image(wfall_buf,100,220,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+voff = (screen_size_x - FFT_SIZE)/2;  //offset to centre
+copy_surface_to_image(wfall_buf,voff,270,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
 //======
@@ -172,6 +190,7 @@ wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*bytes_pp);
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
 clear_screen(rgb565(0,3,0));
+plot_thick_rectangle(frame_buf,0,0,screen_size_x,264,C_BLUE);
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
 
 int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
