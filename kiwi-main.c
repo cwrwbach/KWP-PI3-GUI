@@ -71,6 +71,7 @@ for(i=1;i<n_horiz;i++)
 void draw_spectrum(short colour)
 {
 int val;
+int8_t temp;
 int spec_base;
 int xpos;
 spec_base = SPEC_BASE_LINE;
@@ -80,29 +81,18 @@ for(int b=0;b<SPEC_HEIGHT * SPEC_WIDTH;b++)
     spec_buf[b] = 0x0004;
 
 draw_grid();
-
-//Test values
-/* 
-for(int n = 0; n < FFT_SIZE; n++)
-    {
-    fft_buf[n]=0;
-    }
-fft_buf[256] = 100;
-fft_buf[257] = 100;
-fft_buf[260] = 150;
-fft_buf[261] = 150;
-fft_buf[264] = 200;
-fft_buf[265] = 200;
-*/
-
 xpos = (screen_size_x - FFT_SIZE)/2;  //offset to centre
-//nv=100; //horiz offset
-for(int n = 0; n < FFT_SIZE; n++)
+
+//kiwi_buf[300] = -25; //just a test/debug value
+
+for(int n = 1; n < FFT_SIZE; n++)
     {
-    val= 150 + kiwi_buf[n]; //fft_buf[n];
-    //if (val > 100 || val < 0) 
-        //printf(" Val error at %d \n", val);
-    plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour);
+    temp = kiwi_buf[n];
+    if(temp > 0) { printf("Bin:%d Temp=%d \n",n,temp);temp = -100; } //Spike smuddger ? FIXME
+    val= 128 + temp; //kiwi_buf[n]; //fft_buf[n];
+    val *=2; //scale up plot line (needed?)
+  
+    plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour); //Plots pos've from bottom left.
     xpos++;
     }
 copy_surface_to_image(spec_buf,0,6,SPEC_WIDTH,SPEC_HEIGHT);
