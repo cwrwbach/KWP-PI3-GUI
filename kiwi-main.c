@@ -36,7 +36,7 @@ uint status_pos;
 uint16_t * frame_buf;
 uint16_t * spec_buf;
 uint16_t * wfall_buf;
-int8_t fft_buf[FFT_SIZE];
+//int8_t fft_buf[FFT_SIZE];
 
 uint8_t qtj[3];
 void * setup_kiwi();
@@ -99,9 +99,9 @@ xpos = (screen_size_x - FFT_SIZE)/2;  //offset to centre
 //nv=100; //horiz offset
 for(int n = 0; n < FFT_SIZE; n++)
     {
-    val= fft_buf[n];
-    if (val > 100 || val < 0) 
-        printf(" Val error at %d \n", val);
+    val= 150 + kiwi_buf[n]; //fft_buf[n];
+    //if (val > 100 || val < 0) 
+        //printf(" Val error at %d \n", val);
     plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour);
     xpos++;
     }

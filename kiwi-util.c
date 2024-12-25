@@ -8,15 +8,11 @@
 #include "avc-colours.h"
 
 #define FFT_SIZE 1024
-#define PAK_LEN 1280
-#define HEADER_LEN 256
 
 extern int8_t kiwi_buf[FFT_SIZE];
-bool stream_flag;
 vws_cnx* cnx;
 int debug;
 int watch_dog;
-extern uint8_t fft_buf[FFT_SIZE];
 extern uint8_t qtj[3];
 void * read_kiwi_line();
 extern pthread_t callback_id;
@@ -107,12 +103,7 @@ printf(" Line %d \n",__LINE__);
 debug = 0;
 watch_dog=0;    
 
-//ret=pthread_create(&callback_id,NULL, (void *) read_kiwi_line,NULL);
-//---
-
-int8_t tryit;
-int help;
-
+int8_t temp;
 while(1)
     {   
     vws_msg* reply = vws_msg_recv(cnx);
@@ -132,36 +123,18 @@ while(1)
             vws_frame_send_text(cnx,"SET keepalive");
             }
 
-        for(int i = 0; i< 1024;i++)
+        if(strncmp("W/F",reply->data->data,3)==0)
             {
-            tryit = reply->data->data[i]; 
-     if(tryit > 0) tryit = 0;       
-//printf(" > :%d",tryit);
-
-            kiwi_buf[i] = ((int) reply->data->data[i]); //signed dB
-//printf(" > :%d",kiwi_buf[i]);
+            for(int i = 0; i< 1024;i++)
+                {
+                temp = reply->data->data[i+16]; 
+                kiwi_buf[i] = temp ; //signed dB
+                }
             }
         vws_msg_free(reply);   
-        stream_flag = true; //if I don't flag the FFT the CPU usage becomes 100% FIXME
-
-        for(int i = 0; i< 1024;i++)
-            {
-//printf("#%d ", kiwi_buf[i]);
-            help = (int) kiwi_buf[i];
-            help = 127 +help;
-printf("#%d ",help);
-
-if(help > 125) help = 125;
-            fft_buf[i] = ( int8_t )help ; //20 ; (uint8_t) help; //120 + kiwi_buf[i];
-
-
-
-
-            //if(fft_buf[i]  <3) fft_buf[i] = 30;
-            //printf("$%d #%d ",fft_buf[i], kiwi_buf[i]);
-            }
+ 
         draw_spectrum(C_WHITE);
-        //draw_waterfall();      
+        draw_waterfall();      
         }
     }   
 }
