@@ -68,8 +68,6 @@ inx = x/4;
 }
 
 
-
-
 void draw_grid()
 {
 int i,x,y;
@@ -149,16 +147,24 @@ if(wf_ln > WFALL_HEIGHT)
 for(point=0;point<1024;point++) //FFT SIZE
     {
     //fiddle with thresholds here - just poking ??? *** ???
-    if(kiwi_buf[point] < -80) kiwi_buf[point] = -127;
+    //if(kiwi_buf[point] < -80) kiwi_buf[point] = -127;
    
-    inx = (int) 195+(kiwi_buf[point]); //adjusted to central
+    inx = (int) 130+(kiwi_buf[point]); //adjusted to central
+
     //  inx = 190; /// 32; 
-    red = (uint16_t) jet_col[inx][0]; //qtj[0];
-    green=(uint16_t) jet_col[inx][1]; //qtj[1];
-    blue =(uint16_t) jet_col[inx][2]; //qtj[2];
-    colour = rgb565(red,green,blue);
+  //  red = (uint16_t) jet_col[inx][0]; //qtj[0];
+//    green=(uint16_t) jet_col[inx][1]; //qtj[1];
+    //blue =(uint16_t) jet_col[inx][2]; //qtj[2];
+   // colour = rgb565(red,green,blue);
+    
+//inx = 60;
+
+    colour = get_colour(inx);
+
     set_pixel(wfall_buf,point , 0, colour);
     }
+
+//colour = get_colour(inx);
 
 //Scroll all lines down, starting from the bottom
 for(int line = WFALL_HEIGHT; line >=0 ; line--)

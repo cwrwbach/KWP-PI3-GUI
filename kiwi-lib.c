@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "avc-lib.h"
 #include "avc-font.h"
@@ -13,6 +14,83 @@ extern int screen_size_y;
 extern uint16_t * frame_buf;
 
 //---
+
+
+
+
+
+
+uint16_t get_colour( int inx)
+{
+uint16_t colour;
+
+if(inx > 80) 
+    {
+    colour = rgb565(250, 0,250);
+    return colour;
+    }
+
+if(inx > 70) 
+    {
+    colour = rgb565(0x64, 64,0);
+    return colour;
+    }
+
+if(inx > 60) 
+    {
+    colour = rgb565(0,0,128);
+    return colour;
+    }
+
+if(inx > 50) 
+    {
+    colour = rgb565(0, 64,64);
+    return colour;
+    }
+
+if(inx > 40) 
+    {
+    colour = rgb565(32, 0,32);
+    return colour;
+    }
+
+if(inx > 30) 
+    {
+    colour = rgb565(32, 32,0);
+    return colour;
+    }
+
+if(inx > 20) 
+    {
+    colour = rgb565(255, 0,0);
+    return colour;
+    }
+
+if(inx > 10) 
+    {
+    colour = rgb565(0x32, 32,32);
+    return colour;
+    }
+
+
+colour = rgb565(0, 0,0);
+return colour;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void set_pixel(uint16_t * buf,int x, int y, uint16_t colour)
 {
