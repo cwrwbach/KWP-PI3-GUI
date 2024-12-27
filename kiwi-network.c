@@ -102,7 +102,7 @@ usleep(100000);
 vws_frame_send_text(cnx,"SET wf_comp=0");
 usleep(100000);
 vws_frame_send_text(cnx,"SET ident_user=Squire");
-printf(" Line %d \n",__LINE__);
+//printf(" Line %d \n",__LINE__);
 
 debug = 0;
 watch_dog=0;    

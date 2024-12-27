@@ -17,12 +17,12 @@
 #include "qt_jet.h"
 
 #define FFT_SIZE 1024
-#define FRAME_BUF_WIDTH 1366
+//#define FRAME_BUF_WIDTH 1366
 #define FRAME_BUF_HEIGHT 768
-#define SPEC_WIDTH 1366
+//#define SPEC_WIDTH 1366
 #define SPEC_HEIGHT 256
 #define SPEC_BASE_LINE 255
-#define WFALL_WIDTH 1366
+//#define WFALL_WIDTH 1366
 #define WFALL_HEIGHT 500
 
 struct fb_var_screeninfo vinfo;
@@ -48,15 +48,6 @@ void draw_spectrum(short);
 void draw_waterfall();
 void qt_jet(int);
 //================
-
-int kbhit(void)
-{
-    int k;
-
-    ioctl(STDIN_FILENO,FIONREAD,&k);
-
-    return(k);
-}
 
 
 void demo()
@@ -92,7 +83,7 @@ h_gap = SPEC_HEIGHT/(n_horiz);
 //v_gap = SPEC_WIDTH/(n_verts-2);
 
 for(i=1;i<n_horiz;i++)
-    plot_dotted_line(spec_buf,0,i*h_gap,SPEC_WIDTH,i*h_gap,C_YELLOW);//YELLOW);
+    plot_dotted_line(spec_buf,0,i*h_gap,screen_size_x,i*h_gap,C_YELLOW);//YELLOW);
 
 //for(i=1;i<n_verts-2;i++)
 //    plot_dotted_line(spec_buf,i*v_gap,0,i*v_gap,SPEC_HEIGHT-5,C_YELLOW);//);
@@ -109,7 +100,7 @@ int xpos;
 spec_base = SPEC_BASE_LINE;
 
 //fill backround of SPEC
-for(int b=0;b<SPEC_HEIGHT * SPEC_WIDTH;b++)
+for(int b=0;b<SPEC_HEIGHT * screen_size_x;b++)
     spec_buf[b] = 0x0004;
 
 draw_grid();
@@ -129,7 +120,7 @@ for(int n = 1; n < FFT_SIZE; n++)
     plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour); //Plots pos've from bottom left.
     xpos++;
     }
-copy_surface_to_image(spec_buf,0,6,SPEC_WIDTH,SPEC_HEIGHT);
+copy_surface_to_image(spec_buf,0,6,screen_size_x,SPEC_HEIGHT);
 }
 
 //=========
@@ -143,6 +134,9 @@ int loc_x,loc_y;
 unsigned int wf_ln;
 int inx;
 int xpos;
+int wfall_width;
+
+wfall_width = screen_size_x;
 
 loc_x = 10;
 loc_y = 10;
@@ -167,17 +161,16 @@ for(point=0;point<1024;point++) //FFT SIZE
     }
 
 //Scroll all lines down, starting from the bottom
-for(int ll = WFALL_HEIGHT; ll >=0 ; ll--)
+for(int line = WFALL_HEIGHT; line >=0 ; line--)
     {
-    for(int pp = 0;pp<WFALL_WIDTH;pp++)
+    for(int x = 0;x<wfall_width;x++)
         {
-        wfall_buf[((ll+1)*WFALL_WIDTH)+WFALL_WIDTH+pp] = wfall_buf[((ll)* WFALL_WIDTH)+pp];
+        wfall_buf[((line+1)*wfall_width)+wfall_width+x] = wfall_buf[(line * wfall_width)+x];
         }
     }
 
-
-xpos = (screen_size_x - FFT_SIZE)/2;  //offset to centre
-copy_surface_to_image(wfall_buf,xpos,270,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+xpos = 170; // = (screen_size_x - FFT_SIZE)/2;  //offset to centre
+copy_surface_to_image(wfall_buf,xpos,270,screen_size_x,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
 //======
@@ -207,8 +200,8 @@ bytes_pp = vinfo.bits_per_pixel/8;
 int fb_data_size = screen_size_x * screen_size_y * bytes_pp;
 printf (" FB data size = %d \n",fb_data_size);
 
-spec_buf = malloc(SPEC_WIDTH*SPEC_HEIGHT*bytes_pp);
-wfall_buf = malloc(WFALL_WIDTH*WFALL_HEIGHT*bytes_pp);
+spec_buf = malloc(screen_size_x*SPEC_HEIGHT*bytes_pp);
+wfall_buf = malloc(screen_size_x*WFALL_HEIGHT*bytes_pp);
 
 // map framebuffer to user memory 
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
@@ -224,24 +217,11 @@ int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
 
 printf(" SETUP ==========================  \n");
 
-int q = 42;
-
-
-initscr();
 while(1)
     {
-q = getch();
-//sleep(1);
-
-    printf(" MABLE \n");
-   
-{
-
-}
-
 
   //waiting for C2C commands etc.
-   // sleep(1);
+    sleep(1);
     }
 
 printf(" Debug at %d\n",__LINE__);

@@ -1,3 +1,3 @@
-AVC:
+KIWI:
 
-	gcc kiwi-main.c  avc-lib.c kiwi-util.c -lpthread -lvws -lncurses -o kiwi
+	gcc kiwi-main.c  kiwi-lib.c kiwi-network.c kiwi-shuttle.c -lpthread -lvws  -o kiwi
