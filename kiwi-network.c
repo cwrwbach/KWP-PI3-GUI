@@ -60,7 +60,8 @@ cnx = vws_cnx_new();
 char uri_string[256];
 //pthread_t callback_id,audio_cb_id;
 int ret;
-char fft_video_buf[1536];
+//char fft_video_buf[1536];
+static double log_fft[1024];
 
 // Set connection timeout to 5 seconds (the default is 10). This applies
 // both to connect() and to read operations (i.e. poll()).
@@ -93,7 +94,7 @@ assert(vws_socket_is_connected((vws_socket*)cnx) == true);
 // Send a TEXT frame
 vws_frame_send_text(cnx, "SET auth t=kiwi p=");
 usleep(100000);
-vws_frame_send_text(cnx,"SET zoom=4 cf=17586");
+vws_frame_send_text(cnx,"SET zoom=5 cf=5505"); //17586");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=-50 mindb=-110");
 usleep(100000);
@@ -133,7 +134,13 @@ while(1)
             for(int i = 0; i< 1024;i++)
                 {
                 temp = reply->data->data[i+16]; 
-                kiwi_buf[i] = temp ; //signed dB
+ if(temp > 0) 
+        temp = -100; //bug fudger FIXME
+
+    log_fft[i] -= 0.3f * (log_fft[i] - temp );// Smaller factor increase the average time
+    //log_fft[i] = temp; //BYPASS AVERAGE
+
+                kiwi_buf[i] = (int8_t) log_fft[i] ; //temp ; //signed dB
                 }
 
 strncpy(show,reply->data->data,16);

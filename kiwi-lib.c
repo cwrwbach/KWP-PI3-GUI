@@ -32,13 +32,13 @@ if(inx > 80)
 
 if(inx > 70) 
     {
-    colour = rgb565(0x64, 64,0);
+    colour = rgb565(0x250, 64,0);
     return colour;
     }
 
 if(inx > 60) 
     {
-    colour = rgb565(0,0,128);
+    colour = rgb565(250,0,0);
     return colour;
     }
 
@@ -50,19 +50,19 @@ if(inx > 50)
 
 if(inx > 40) 
     {
-    colour = rgb565(32, 0,32);
+    colour = rgb565(32, 32,0);
     return colour;
     }
 
 if(inx > 30) 
     {
-    colour = rgb565(32, 32,0);
+    colour = rgb565(0, 32,0);
     return colour;
     }
 
 if(inx > 20) 
     {
-    colour = rgb565(255, 0,0);
+    colour = rgb565(0, 8,0);
     return colour;
     }
 

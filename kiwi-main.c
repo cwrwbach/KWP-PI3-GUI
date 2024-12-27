@@ -46,7 +46,9 @@ pthread_t callback_id;
 
 void draw_spectrum(short);
 void draw_waterfall();
-void qt_jet(int);
+//void qt_jet(int);
+
+uint16_t get_colour(int);
 //================
 
 
@@ -96,6 +98,7 @@ int8_t temp;
 int spec_base;
 int xpos;
 spec_base = SPEC_BASE_LINE;
+
 
 //fill backround of SPEC
 for(int b=0;b<SPEC_HEIGHT * screen_size_x;b++)
