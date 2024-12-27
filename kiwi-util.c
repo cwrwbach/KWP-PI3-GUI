@@ -68,7 +68,11 @@ vws_socket_set_timeout((vws_socket*)cnx, 5);
 time_t utc_now = time( NULL );
 printf(" utc %d \n" , utc_now);
 
+//http://81.168.1.206:8073/
+//http://shack2.ddns.net:8073/
+//http://80m.live:8079/
 //Complete 'GET' header string is:
+//sprintf(uri_string,"ws://81.168.1.206:8073/%d/W/F",utc_now);
 sprintf(uri_string,"ws://norsom.proxy.kiwisdr.com:8073/%d/W/F",utc_now);
 printf("Header string: %s\n",uri_string);
 
@@ -91,19 +95,20 @@ vws_frame_send_text(cnx, "SET auth t=kiwi p=");
 usleep(100000);
 vws_frame_send_text(cnx,"SET zoom=4 cf=17586");
 usleep(100000);
-vws_frame_send_text(cnx,"SET maxdb=0 mindb=-100");
+vws_frame_send_text(cnx,"SET maxdb=-50 mindb=-110");
 usleep(100000);
-vws_frame_send_text(cnx,"SET wf_speed=2");
+vws_frame_send_text(cnx,"SET wf_speed=3");
 usleep(100000);
 vws_frame_send_text(cnx,"SET wf_comp=0");
 usleep(100000);
-vws_frame_send_text(cnx,"SET ident_user=Captain");
+vws_frame_send_text(cnx,"SET ident_user=Squire");
 printf(" Line %d \n",__LINE__);
 
 debug = 0;
 watch_dog=0;    
 
 int8_t temp;
+char show[32];
 while(1)
     {   
     vws_msg* reply = vws_msg_recv(cnx);
@@ -116,7 +121,7 @@ while(1)
     else
         {
         // Free message
-        printf(" Received: %d \n",debug++);
+        //printf(" Received: %d \n",debug++);
         if(watch_dog++ > 30)
             {
             watch_dog = 0;
@@ -130,6 +135,13 @@ while(1)
                 temp = reply->data->data[i+16]; 
                 kiwi_buf[i] = temp ; //signed dB
                 }
+
+strncpy(show,reply->data->data,16);
+//for(int n=3;n<16;n++)
+//    printf("0x%x ",show[n]);
+//printf("\n");
+
+
             }
         vws_msg_free(reply);   
  

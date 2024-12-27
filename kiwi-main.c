@@ -9,6 +9,8 @@
 #include <inttypes.h>
 #include <math.h>
 #include <unistd.h>
+#include <ncurses.h>
+
 #include "avc-lib.h"
 #include "avc-colours.h"
 #include "waterfall.h"
@@ -46,6 +48,36 @@ void draw_spectrum(short);
 void draw_waterfall();
 void qt_jet(int);
 //================
+
+int kbhit(void)
+{
+    int k;
+
+    ioctl(STDIN_FILENO,FIONREAD,&k);
+
+    return(k);
+}
+
+
+void demo()
+{
+short clr;
+uint16_t colour,red,green,blue;
+int inx;
+
+for(int x = 0; x<1024;x++)
+    {
+inx = x/4;
+    red = (uint16_t) jet_col[inx][0]; //qtj[0];
+    green=(uint16_t) jet_col[inx][1]; //qtj[1];
+    blue =(uint16_t) jet_col[inx][2]; //qtj[2];
+    clr = rgb565(red,green,blue);
+    plot_line(frame_buf,x,0,x,50,clr);
+    }
+}
+
+
+
 
 void draw_grid()
 {
@@ -88,7 +120,9 @@ xpos = (screen_size_x - FFT_SIZE)/2;  //offset to centre
 for(int n = 1; n < FFT_SIZE; n++)
     {
     temp = kiwi_buf[n];
-    if(temp > 0) { printf("Bin:%d Temp=%d \n",n,temp);temp = -100; } //Spike smuddger ? FIXME
+    //if(temp > 0) { printf("Bin:%d Spike=%d \n",n,temp);} //temp = -100; } //Spike smuddger ? FIXME
+    if(temp > 0) 
+        temp = -100; //bug fudger FIXME
     val= 128 + temp; //kiwi_buf[n]; //fft_buf[n];
     val *=2; //scale up plot line (needed?)
   
@@ -121,12 +155,10 @@ if(wf_ln > WFALL_HEIGHT)
 for(point=0;point<1024;point++) //FFT SIZE
     {
     //fiddle with thresholds here - just poking ??? *** ???
-    //if(kiwi_buf[point] < -80) kiwi_buf[point] = -130;
+    if(kiwi_buf[point] < -80) kiwi_buf[point] = -127;
    
-    inx = (int) 200+(kiwi_buf[point]); //adjusted to central
-       
-    qt_jet(inx); //look-up colour
-
+    inx = (int) 195+(kiwi_buf[point]); //adjusted to central
+    //  inx = 190; /// 32; 
     red = (uint16_t) jet_col[inx][0]; //qtj[0];
     green=(uint16_t) jet_col[inx][1]; //qtj[1];
     blue =(uint16_t) jet_col[inx][2]; //qtj[2];
@@ -135,13 +167,15 @@ for(point=0;point<1024;point++) //FFT SIZE
     }
 
 //Scroll all lines down, starting from the bottom
-    for(int ll = WFALL_HEIGHT; ll >=0 ; ll--)
+for(int ll = WFALL_HEIGHT; ll >=0 ; ll--)
     {
     for(int pp = 0;pp<WFALL_WIDTH;pp++)
         {
         wfall_buf[((ll+1)*WFALL_WIDTH)+WFALL_WIDTH+pp] = wfall_buf[((ll)* WFALL_WIDTH)+pp];
         }
     }
+
+
 xpos = (screen_size_x - FFT_SIZE)/2;  //offset to centre
 copy_surface_to_image(wfall_buf,xpos,270,WFALL_WIDTH,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
@@ -183,14 +217,31 @@ clear_screen(rgb565(0,3,0));
 plot_thick_rectangle(frame_buf,0,0,screen_size_x,264,C_BLUE);
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
 
+//demo();
+//while(1) sleep(1);
+
 int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
 
 printf(" SETUP ==========================  \n");
 
+int q = 42;
+
+
+initscr();
 while(1)
     {
-    //waiting for C2C commands etc.
-    sleep(1);
+q = getch();
+//sleep(1);
+
+    printf(" MABLE \n");
+   
+{
+
+}
+
+
+  //waiting for C2C commands etc.
+   // sleep(1);
     }
 
 printf(" Debug at %d\n",__LINE__);
