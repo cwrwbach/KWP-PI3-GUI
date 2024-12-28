@@ -9,7 +9,7 @@
 #include "kiwi-colours.h"
 #include "ArialNum32x50.h"
 
-extern int screen_size_x;
+extern int g_screen_size_x;
 extern int screen_size_y;
 extern uint16_t * frame_buf;
 
@@ -97,7 +97,7 @@ void set_pixel(uint16_t * buf,int x, int y, uint16_t colour)
 int sz_x,sz_y;
 int32_t location;
 
-sz_x = screen_size_x;
+sz_x = g_screen_size_x;
 sz_y = screen_size_y;
 
 if(x<0) x=1;
@@ -112,7 +112,7 @@ buf[location] = colour;
 
 void clear_screen(uint16_t pixval)
 {
-for(int p=0;p<(screen_size_x*screen_size_y);p++)
+for(int p=0;p<(g_screen_size_x*screen_size_y);p++)
     frame_buf[p] = pixval;
 }
 
@@ -267,7 +267,7 @@ for(int s=0;s<len;s++,xp++)
 }
 
 
-void copy_surface_to_image(uint16_t *buf,uint loc_x,uint loc_y,uint sz_x,uint sz_y)
+void copy_surface_to_framebuf(uint16_t *buf,uint loc_x,uint loc_y,uint sz_x,uint sz_y)
 {
 int x,y;
 int y_offset;

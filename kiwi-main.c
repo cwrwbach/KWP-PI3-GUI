@@ -17,12 +17,10 @@
 #include "qt_jet.h"
 
 #define FFT_SIZE 1024
-//#define FRAME_BUF_WIDTH 1366
+
 #define FRAME_BUF_HEIGHT 768
-//#define SPEC_WIDTH 1366
 #define SPEC_HEIGHT 256
 #define SPEC_BASE_LINE 255
-//#define WFALL_WIDTH 1366
 #define WFALL_HEIGHT 500
 
 struct fb_var_screeninfo vinfo;
@@ -31,7 +29,7 @@ int fbfd;
 
 long int screensize ;
 int8_t kiwi_buf[FFT_SIZE];
-uint screen_size_x;
+uint g_screen_size_x;
 uint screen_size_y;
 uint bytes_pp;
 uint status_pos;
@@ -40,6 +38,7 @@ uint16_t * spec_buf;
 uint16_t * wfall_buf;
 //int8_t fft_buf[FFT_SIZE];
 
+//declarations
 uint8_t qtj[3];
 void * setup_kiwi();
 pthread_t callback_id;
@@ -100,7 +99,7 @@ h_gap = SPEC_HEIGHT/(n_horiz);
 //v_gap = SPEC_WIDTH/(n_verts-2);
 
 for(i=1;i<n_horiz;i++)
-    plot_dotted_line(spec_buf,0,i*h_gap,screen_size_x,i*h_gap,C_YELLOW);//YELLOW);
+    plot_dotted_line(spec_buf,0,i*h_gap,g_screen_size_x,i*h_gap,C_YELLOW);//YELLOW);
 
 //for(i=1;i<n_verts-2;i++)
 //    plot_dotted_line(spec_buf,i*v_gap,0,i*v_gap,SPEC_HEIGHT-5,C_YELLOW);//);
@@ -118,12 +117,11 @@ spec_base = SPEC_BASE_LINE;
 
 
 //fill backround of SPEC
-for(int b=0;b<SPEC_HEIGHT * screen_size_x;b++)
+for(int b=0;b<SPEC_HEIGHT * g_screen_size_x;b++)
     spec_buf[b] = 0x0004;
 
 draw_grid();
-xpos = (screen_size_x - FFT_SIZE)/2;  //offset to centre
-
+xpos = (g_screen_size_x - FFT_SIZE)/2;  //offset to centre
 //kiwi_buf[300] = -25; //just a test/debug value
 
 for(int n = 1; n < FFT_SIZE; n++)
@@ -138,7 +136,7 @@ for(int n = 1; n < FFT_SIZE; n++)
     plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour); //Plots pos've from bottom left.
     xpos++;
     }
-copy_surface_to_image(spec_buf,0,6,screen_size_x,SPEC_HEIGHT);
+copy_surface_to_framebuf(spec_buf,0,6,g_screen_size_x,SPEC_HEIGHT);
 }
 
 //=========
@@ -154,7 +152,7 @@ int inx;
 int xpos;
 int wfall_width;
 
-wfall_width = screen_size_x;
+wfall_width = g_screen_size_x;
 
 loc_x = 10;
 loc_y = 10;
@@ -196,7 +194,7 @@ for(int line = WFALL_HEIGHT; line >=0 ; line--)
     }
 
 xpos = 170; // = (screen_size_x - FFT_SIZE)/2;  //offset to centre
-copy_surface_to_image(wfall_buf,xpos,270,screen_size_x,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+copy_surface_to_framebuf(wfall_buf,xpos,270,g_screen_size_x,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
 //======
@@ -219,21 +217,21 @@ if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo)) // Get variable screen information
 	    printf("Error reading variable screen info.\n");
 printf("Display info %dx%d, %d bpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel );
 
-screen_size_x = vinfo.xres;
+g_screen_size_x = vinfo.xres;
 screen_size_y = vinfo.yres;
 bytes_pp = vinfo.bits_per_pixel/8;
 
-int fb_data_size = screen_size_x * screen_size_y * bytes_pp;
+int fb_data_size = g_screen_size_x * screen_size_y * bytes_pp;
 printf (" FB data size = %d \n",fb_data_size);
 
-spec_buf = malloc(screen_size_x*SPEC_HEIGHT*bytes_pp);
-wfall_buf = malloc(screen_size_x*WFALL_HEIGHT*bytes_pp);
+spec_buf = malloc(g_screen_size_x*SPEC_HEIGHT*bytes_pp);
+wfall_buf = malloc(g_screen_size_x*WFALL_HEIGHT*bytes_pp);
 
 // map framebuffer to user memory 
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
 clear_screen(rgb565(0,3,0));
-plot_thick_rectangle(frame_buf,0,0,screen_size_x,264,C_BLUE);
+plot_thick_rectangle(frame_buf,0,0,g_screen_size_x,264,C_BLUE);
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
 
 

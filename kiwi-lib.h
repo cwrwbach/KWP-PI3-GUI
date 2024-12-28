@@ -3,7 +3,7 @@
 
 
 
-short rgb565(short red,short green,short blue);
+//short rgb565(short red,short green,short blue);
 
 
 
@@ -35,4 +35,4 @@ void plot_large_character(uint16_t * buf,int x, int y,uint8_t char_num,uint16_t 
 
 void plot_large_string(uint16_t * buf , int x, int y,uint8_t * string ,uint16_t colour);
 
-void copy_surface_to_image(uint16_t *,uint,uint,uint,uint); // (buf,loc_x,lox_y,sz_x,sz_y)
+void copy_surface_to_framebuf(uint16_t *,uint,uint,uint,uint); // (buf,loc_x,lox_y,sz_x,sz_y)
