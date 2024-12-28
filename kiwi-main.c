@@ -19,9 +19,11 @@
 #define FFT_SIZE 1024
 
 #define FRAME_BUF_HEIGHT 768
-#define SPEC_HEIGHT 256
-#define SPEC_BASE_LINE 255
+#define SPEC_HEIGHT 200
+#define SPEC_BASE_LINE 199
 #define WFALL_HEIGHT 500
+#define LEGEND_HEIGHT 200
+#define LEGEND_WIDTH 400
 
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
@@ -30,13 +32,17 @@ int fbfd;
 long int screensize ;
 int8_t kiwi_buf[FFT_SIZE];
 uint g_screen_size_x;
+uint leg_x;
+uint leg_y;
+
 uint screen_size_y;
 uint bytes_pp;
 uint status_pos;
 uint16_t * frame_buf;
 uint16_t * spec_buf;
 uint16_t * wfall_buf;
-//int8_t fft_buf[FFT_SIZE];
+uint16_t * leg_buf;
+
 
 //declarations
 uint8_t qtj[3];
@@ -110,11 +116,10 @@ for(i=1;i<n_horiz;i++)
 void draw_spectrum(short colour)
 {
 int val;
-int8_t temp;
+int8_t level;
 int spec_base;
 int xpos;
 spec_base = SPEC_BASE_LINE;
-
 
 //fill backround of SPEC
 for(int b=0;b<SPEC_HEIGHT * g_screen_size_x;b++)
@@ -122,16 +127,17 @@ for(int b=0;b<SPEC_HEIGHT * g_screen_size_x;b++)
 
 draw_grid();
 xpos = (g_screen_size_x - FFT_SIZE)/2;  //offset to centre
-//kiwi_buf[300] = -25; //just a test/debug value
+//xpos = 0;
+
+kiwi_buf[10] = -40; //just a test/debug value
+kiwi_buf[14] = -60; 
+kiwi_buf[18] = -80; 
 
 for(int n = 1; n < FFT_SIZE; n++)
     {
-    temp = kiwi_buf[n];
-    //if(temp > 0) { printf("Bin:%d Spike=%d \n",n,temp);} //temp = -100; } //Spike smuddger ? FIXME
-    if(temp > 0) 
-        temp = -100; //bug fudger FIXME
-    val= 128 + temp; //kiwi_buf[n]; //fft_buf[n];
-    val *=2; //scale up plot line (needed?)
+    level = kiwi_buf[n];
+    val= 120 + level; 
+    val *=2; //Scale up * 2
   
     plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour); //Plots pos've from bottom left.
     xpos++;
@@ -227,17 +233,36 @@ printf (" FB data size = %d \n",fb_data_size);
 spec_buf = malloc(g_screen_size_x*SPEC_HEIGHT*bytes_pp);
 wfall_buf = malloc(g_screen_size_x*WFALL_HEIGHT*bytes_pp);
 
+leg_x = LEGEND_WIDTH;
+leg_y = LEGEND_HEIGHT;
+leg_buf = malloc(leg_x * leg_y * bytes_pp);
+
+//plot_large_string(leg_buf,50,50,"TESTING",C_WHITE);
+
+for(int x=0;x<(leg_x * leg_y); x++)
+    leg_buf[x] = 0xfc00;
+
+//plot_thick_rectangle(frame_buf,25,25,100,100,C_BLUE);
+//plot_thick_line(frame_buf,25,25,125,125,C_WHITE);
+
 // map framebuffer to user memory 
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
 clear_screen(rgb565(0,3,0));
-plot_thick_rectangle(frame_buf,0,0,g_screen_size_x,264,C_BLUE);
+plot_thick_rectangle(frame_buf,0,0,g_screen_size_x,210,C_BLUE);
+
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
+
+plot_thick_line(leg_buf,100,5,100,25,C_WHITE);
+//plot_thick_rectangle(frame_buf,25,25,100,100,C_BLUE);
+
+copy_surface_to_framebuf(leg_buf,500,400,leg_x,leg_y);
+
 
 
 printf(" STOP AT DEMO - Main Line: %d \n",__LINE__);
-demo();
-demo2();
+//demo();
+//demo2();
 
 //while(1) sleep(1);
 

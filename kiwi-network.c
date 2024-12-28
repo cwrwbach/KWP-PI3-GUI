@@ -135,7 +135,7 @@ while(1)
                 {
                 temp = reply->data->data[i+16]; 
  if(temp > 0) 
-        temp = -100; //bug fudger FIXME
+        temp = -100; //bug fudger FIXME (SPIKE SMOTHER)
 
     log_fft[i] -= 0.3f * (log_fft[i] - temp );// Smaller factor increase the average time
     //log_fft[i] = temp; //BYPASS AVERAGE
@@ -152,7 +152,7 @@ strncpy(show,reply->data->data,16);
             }
         vws_msg_free(reply);   
  
-        draw_spectrum(C_WHITE);
+        draw_spectrum(C_GREEN);
         draw_waterfall();      
         }
     }   

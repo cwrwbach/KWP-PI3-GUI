@@ -277,7 +277,7 @@ src_ptr=0;
 
 for(y=0;y<sz_y;y++) //height
     {
-    y_offset = (loc_y + y) * sz_x;
+    y_offset = (loc_y + y) * g_screen_size_x;
     for(x=0;x<sz_x;x++) //width
         {
         frame_buf[y_offset +x +loc_x] = buf[src_ptr++]; 
