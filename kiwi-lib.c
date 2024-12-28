@@ -4,9 +4,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "avc-lib.h"
-#include "avc-font.h"
-#include "avc-colours.h"
+#include "kiwi-lib.h"
+#include "kiwi-font.h"
+#include "kiwi-colours.h"
 #include "ArialNum32x50.h"
 
 extern int screen_size_x;

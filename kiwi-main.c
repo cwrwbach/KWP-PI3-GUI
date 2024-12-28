@@ -11,8 +11,8 @@
 #include <unistd.h>
 #include <ncurses.h>
 
-#include "avc-lib.h"
-#include "avc-colours.h"
+#include "kiwi-lib.h"
+#include "kiwi-colours.h"
 #include "waterfall.h"
 #include "qt_jet.h"
 
@@ -66,6 +66,23 @@ inx = x/4;
     blue =(uint16_t) jet_col[inx][2]; //qtj[2];
     clr = rgb565(red,green,blue);
     plot_line(frame_buf,x,0,x,50,clr);
+    }
+}
+
+
+
+void demo2()
+{
+short clr;
+uint16_t colour,red,green,blue;
+int inx;
+
+for(int x = 0; x<1024;x++)
+    {
+inx = x/8;
+   
+    clr = get_colour(inx);
+    plot_line(frame_buf,x,50,x,100,clr);
     }
 }
 
@@ -219,7 +236,11 @@ clear_screen(rgb565(0,3,0));
 plot_thick_rectangle(frame_buf,0,0,screen_size_x,264,C_BLUE);
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
 
-//demo();
+
+printf(" STOP AT DEMO - Main Line: %d \n",__LINE__);
+demo();
+demo2();
+
 //while(1) sleep(1);
 
 int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
