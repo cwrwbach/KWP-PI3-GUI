@@ -21,7 +21,8 @@
 #define FRAME_BUF_HEIGHT 768
 #define SPEC_HEIGHT 200
 #define SPEC_BASE_LINE 199
-#define WFALL_HEIGHT 500
+#define WFALL_HEIGHT 450
+#define WFALL_Y_POS 220
 #define LEGEND_HEIGHT 200
 #define LEGEND_WIDTH 400
 
@@ -200,7 +201,7 @@ for(int line = WFALL_HEIGHT; line >=0 ; line--)
     }
 
 xpos = 170; // = (screen_size_x - FFT_SIZE)/2;  //offset to centre
-copy_surface_to_framebuf(wfall_buf,xpos,270,g_screen_size_x,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
+copy_surface_to_framebuf(wfall_buf,xpos,WFALL_Y_POS,g_screen_size_x,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
 //======
