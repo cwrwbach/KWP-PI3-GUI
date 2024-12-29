@@ -168,13 +168,15 @@ wf_ln++;
 if(wf_ln > WFALL_HEIGHT)
     wf_ln = 1;
 
+xpos = 170; //FIXME X POS WFALL
+
 //Draw first line of waterfall
 for(point=0;point<1024;point++) //FFT SIZE
     {
     //fiddle with thresholds here - just poking ??? *** ???
     //if(kiwi_buf[point] < -80) kiwi_buf[point] = -127;
    
-    inx = (int) 130+(kiwi_buf[point]); //adjusted to central
+    inx = (int) 130+(kiwi_buf[point]); //adjusted
 
     //  inx = 190; /// 32; 
   //  red = (uint16_t) jet_col[inx][0]; //qtj[0];
@@ -186,7 +188,7 @@ for(point=0;point<1024;point++) //FFT SIZE
 
     colour = get_colour(inx);
 
-    set_pixel(wfall_buf,point , 0, colour);
+    set_pixel(wfall_buf,point + xpos , 0, colour);
     }
 
 //colour = get_colour(inx);
@@ -200,7 +202,7 @@ for(int line = WFALL_HEIGHT; line >=0 ; line--)
         }
     }
 
-xpos = 170; // = (screen_size_x - FFT_SIZE)/2;  //offset to centre
+//xpos = 170; // = (screen_size_x - FFT_SIZE)/2;  //offset to centre
 copy_surface_to_framebuf(wfall_buf,xpos,WFALL_Y_POS,g_screen_size_x,WFALL_HEIGHT); // (buf,loc_x,lox_y,sz_x,sz_y)
 }
 
@@ -271,11 +273,13 @@ int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
 
 printf(" SETUP ==========================  \n");
 
+plot_thick_rectangle(frame_buf,0,670,g_screen_size_x,90,C_YELLOW);
+
 while(1)
     {
-
+    shittle();
   //waiting for C2C commands etc.
-    sleep(1);
+    
     }
 
 printf(" Debug at %d\n",__LINE__);

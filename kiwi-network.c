@@ -98,7 +98,7 @@ vws_frame_send_text(cnx,"SET zoom=5 cf=5505"); //17586");
 usleep(100000);
 vws_frame_send_text(cnx,"SET maxdb=-50 mindb=-110");
 usleep(100000);
-vws_frame_send_text(cnx,"SET wf_speed=3");
+vws_frame_send_text(cnx,"SET wf_speed=2");
 usleep(100000);
 vws_frame_send_text(cnx,"SET wf_comp=0");
 usleep(100000);

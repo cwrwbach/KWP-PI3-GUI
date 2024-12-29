@@ -266,8 +266,20 @@ for(int s=0;s<len;s++,xp++)
     }
 }
 
-
 void copy_surface_to_framebuf(uint16_t *buf,uint loc_x,uint loc_y,uint sz_x,uint sz_y)
+{
+uint start,size;
+
+start = loc_y * g_screen_size_x;
+size = sz_y * g_screen_size_x * 2;
+
+memcpy(frame_buf+start, buf,size);
+
+}
+
+
+
+void xxxcopy_surface_to_framebuf(uint16_t *buf,uint loc_x,uint loc_y,uint sz_x,uint sz_y)
 {
 int x,y;
 int y_offset;
