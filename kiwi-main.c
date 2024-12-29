@@ -9,13 +9,15 @@
 #include <inttypes.h>
 #include <math.h>
 #include <unistd.h>
-#include <ncurses.h>
+
+#include "kiwi-conf.h"
 
 #include "kiwi-lib.h"
 #include "kiwi-colours.h"
 #include "waterfall.h"
 #include "qt_jet.h"
 
+/*
 #define FFT_SIZE 1024
 
 #define FRAME_BUF_HEIGHT 768
@@ -23,6 +25,10 @@
 #define SPEC_BASE_LINE 199
 #define WFALL_HEIGHT 450
 #define WFALL_Y_POS 220
+#define CMD_HEIGHT 80
+#define CMD_POS 670
+*/
+
 #define LEGEND_HEIGHT 200
 #define LEGEND_WIDTH 400
 
@@ -31,17 +37,22 @@ struct fb_fix_screeninfo finfo;
 int fbfd;
 
 long int screensize ;
+uint g_centre_freq;
+
 int8_t kiwi_buf[FFT_SIZE];
-uint g_screen_size_x;
+
+
 uint leg_x;
 uint leg_y;
 
+uint g_screen_size_x;
 uint screen_size_y;
 uint bytes_pp;
 uint status_pos;
 uint16_t * frame_buf;
 uint16_t * spec_buf;
 uint16_t * wfall_buf;
+uint16_t * cmd_buf;
 uint16_t * leg_buf;
 
 
@@ -218,6 +229,9 @@ int err;
 int moop;
 __u32 dummy = 0;
 
+
+g_centre_freq = 10000;
+
 fbfd = open("/dev/fb0", O_RDWR); // Open the framebuffer device file for reading and writing
 if (fbfd == -1) 
     printf("Error: cannot open framebuffer device.\n");
@@ -235,6 +249,7 @@ printf (" FB data size = %d \n",fb_data_size);
 
 spec_buf = malloc(g_screen_size_x*SPEC_HEIGHT*bytes_pp);
 wfall_buf = malloc(g_screen_size_x*WFALL_HEIGHT*bytes_pp);
+cmd_buf = malloc(g_screen_size_x*CMD_HEIGHT*bytes_pp);
 
 leg_x = LEGEND_WIDTH;
 leg_y = LEGEND_HEIGHT;
@@ -273,7 +288,8 @@ int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
 
 printf(" SETUP ==========================  \n");
 
-plot_thick_rectangle(frame_buf,0,670,g_screen_size_x,90,C_YELLOW);
+//plot_thick_rectangle(frame_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT,C_YELLOW);
+plot_thick_rectangle(cmd_buf,0,0,g_screen_size_x,CMD_HEIGHT-6,C_YELLOW);
 
 while(1)
     {

@@ -1,8 +1,3 @@
-
-//#include "shuttle.h"
-
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -10,15 +5,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
 #include <linux/input.h>
-
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
 #include <regex.h>
+#include <math.h>
+#include <unistd.h>
+#include <inttypes.h>
 
+#include "kiwi-conf.h"
+//#include "kiwi-lib.h"
+#include "kiwi-colours.h"
+//#include "waterfall.h"
+//#include "qt_jet.h"
+
+extern uint g_centre_freq;
+extern uint16_t * cmd_buf;
+extern uint g_screen_size_x;
 
 void shittle()
 {
@@ -52,6 +56,13 @@ if(ioctl( fds, EVIOCGRAB, 1 ) < 0)
 // if we get to here, we're connected to shuttleXpress
 printf("Shuttle device connected. dv: %d\n",fds);;
 
+char freq_string[8];
+
+sprintf(freq_string,"CF: %d ",g_centre_freq);
+
+plot_large_string(cmd_buf,670,40,freq_string,C_YELLOW);
+
+copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 
 while(1)
 	{
