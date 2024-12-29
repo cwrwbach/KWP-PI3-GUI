@@ -24,6 +24,20 @@ extern uint g_centre_freq;
 extern uint16_t * cmd_buf;
 extern uint g_screen_size_x;
 
+
+void update_cmd()
+{
+char freq_string[16];
+
+memset( cmd_buf,0x00,CMD_HEIGHT * g_screen_size_x * 2); //this kills rectangle FIXME
+sprintf(freq_string,"CF: %d ",g_centre_freq);
+
+plot_large_string(cmd_buf,670,40,freq_string,C_YELLOW);
+
+copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+
+}
+
 void shittle()
 {
 int xx;
@@ -56,6 +70,9 @@ if(ioctl( fds, EVIOCGRAB, 1 ) < 0)
 // if we get to here, we're connected to shuttleXpress
 printf("Shuttle device connected. dv: %d\n",fds);;
 
+update_cmd();
+
+/*
 char freq_string[8];
 
 sprintf(freq_string,"CF: %d ",g_centre_freq);
@@ -63,6 +80,8 @@ sprintf(freq_string,"CF: %d ",g_centre_freq);
 plot_large_string(cmd_buf,670,40,freq_string,C_YELLOW);
 
 copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+*/
+
 
 while(1)
 	{
@@ -74,6 +93,9 @@ if(n > 0)
 //printf(" Data is rxd from the Shuttle N: %d \n",n);
 //printf(" Data recd: *** %d \n",n);
 printf(" Type: %d Code: %d  Value: %d \n",ev.type,ev.code,ev.value);
+
+g_centre_freq +=1234;
+update_cmd();
 		}
 //usleep(100000);
 //printf(" \n");
