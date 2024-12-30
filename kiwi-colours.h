@@ -1,15 +1,4 @@
-/*
-#define WHITE   0x00ffffff
-#define BLACK   0x00000000
-#define GREY    0x0x404040
-#define RED     0x00ff0000
-#define GREEN   0x0000ff00
-#define BLUE    0x000000ff
-#define YELLOW  0x00ffff00
-#define CYAN    0x0000ffff
-#define MAGENTA 0x00ff00ff
-#define DARK_GREEN 0x00004000
-*/
+
 
 #define C_MAROON                       0x8000
 #define C_DARK_RED                     0x8800

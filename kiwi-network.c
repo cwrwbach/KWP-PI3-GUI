@@ -1,12 +1,15 @@
-#include <stdbool.h>
+/*#include <stdbool.h>
 #include <unistd.h> 
 #include <fcntl.h>
 #include <stdio.h>
 #include <pthread.h>
-#include <math.h>
+#include <math.h>*/
+
 #include <vws/websocket.h>
+
 #include "kiwi-colours.h"
 
+#include "kiwi-lib.h"
 #define FFT_SIZE 1024
 
 extern int8_t kiwi_buf[FFT_SIZE];

@@ -1,4 +1,4 @@
-#include <fcntl.h>
+/*#include <fcntl.h>
 #include <stdio.h>
 #include <pthread.h>
 #include <sys/ioctl.h>
@@ -9,13 +9,15 @@
 #include <inttypes.h>
 #include <math.h>
 #include <unistd.h>
-
+*/
 #include "kiwi-conf.h"
 
 #include "kiwi-lib.h"
 #include "kiwi-colours.h"
-#include "waterfall.h"
-#include "qt_jet.h"
+#include "kiwi-jet.h"
+
+//#include "waterfall.h"
+//#include "qt_jet.h"
 
 /*
 #define FFT_SIZE 1024

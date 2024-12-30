@@ -1,13 +1,14 @@
-#include <inttypes.h>
+/*#include <inttypes.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+*/
 
 #include "kiwi-lib.h"
 #include "kiwi-font.h"
 #include "kiwi-colours.h"
-#include "ArialNum32x50.h"
+//#include "ArialNum32x50.h"
 
 extern int g_screen_size_x;
 extern int screen_size_y;
