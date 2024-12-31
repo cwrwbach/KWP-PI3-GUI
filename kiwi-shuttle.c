@@ -16,10 +16,12 @@ extern uint g_screen_size_x;
 extern int box_width;
 
 int cmd_select;
+char cmd_string[16];
+
 
 void update_cmd()
 {
-char cmd_string[16];
+
 
 for(int cs = 0 ; cs < 5; cs++)
 	{
@@ -142,6 +144,65 @@ printf(" Count =%d \n",deb++);
 		cmd_select -=1;
 		if(cmd_select < 0 ) cmd_select = 0;
 		}
+
+
+
+	if(ev.code ==263 && ev.value ==1)
+		{
+		if(cmd_select == 1)
+			{
+			g_zoom +=1;
+			if(g_speed > 14) 
+				g_speed = 14;
+			sprintf(cmd_string,"        ");
+			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+
+
+			sprintf(cmd_string,"Zoom: %d ",g_zoom);
+			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+			}
+		if(cmd_select == 3)
+			{
+			g_speed +=1;
+			if(g_speed > 3) g_speed = 3;
+			}
+		if(cmd_select == 4)
+			{
+			g_url +=1;
+			if(g_speed > 9) g_speed = 9;
+			}
+		}
+	
+	if(ev.code ==261 && ev.value ==1)
+		{
+		if(cmd_select ==1)
+			{
+			g_zoom -=1;
+			if(g_zoom < 0 ) 
+				g_zoom = 0;
+			sprintf(cmd_string,"        ");
+			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+
+			sprintf(cmd_string,"Zoom: %d ",g_zoom);
+			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+			}
+		if(cmd_select == 3)
+			{
+			g_speed -=1;
+			if(g_speed <0) g_speed = 0;
+			}
+		if(cmd_select == 4)
+			{
+			g_url -=1;
+			if(g_speed <0) g_speed = 0;
+			}
+		}
+
+
+
+
 printf(" ACT %d \n",cmd_select);
 
 g_centre_freq +=1234;
