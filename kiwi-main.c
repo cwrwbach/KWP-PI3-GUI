@@ -9,6 +9,11 @@ struct fb_fix_screeninfo finfo;
 int fbfd;
 long int screensize ;
 uint g_centre_freq;
+uint g_zoom;
+uint g_speed;
+uint g_url;
+
+
 int8_t kiwi_buf[FFT_SIZE];
 
 uint g_screen_size_x;

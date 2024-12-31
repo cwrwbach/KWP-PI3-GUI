@@ -4,6 +4,13 @@
 #include "kiwi-lib.h"
 
 extern uint g_centre_freq;
+
+extern uint g_zoom;
+extern uint g_speed;
+extern uint g_url;
+
+
+
 extern uint16_t * cmd_buf;
 extern uint g_screen_size_x;
 extern int box_width;
@@ -26,23 +33,24 @@ copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 switch (cmd_select)
 	{
 	case 0:
-        printf("CASE 0.");
+        sprintf(cmd_string,"System. ");
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
         break;
 	case 1:
-		sprintf(cmd_string,"Zoom: %d ",g_centre_freq);
-        plot_large_string(cmd_buf,(cmd_select * 275) +100,40,cmd_string,C_YELLOW);
+		sprintf(cmd_string,"Zoom: %d ",g_zoom);
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
         break;
 	case 2:
 		sprintf(cmd_string,"CF: %d ",g_centre_freq);
-        plot_large_string(cmd_buf,(cmd_select * 275) +100,40,cmd_string,C_YELLOW);
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
         break;
 	case 3:
-		sprintf(cmd_string,"Speed: %d ",g_centre_freq);
-        plot_large_string(cmd_buf,(cmd_select * 275) +100,40,cmd_string,C_YELLOW);
+		sprintf(cmd_string,"Speed: %d ",g_speed);
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
         break;
 	case 4:
-		sprintf(cmd_string,"URL: %d ",g_centre_freq);
-        plot_large_string(cmd_buf,(cmd_select * 275) +100,40,cmd_string,C_YELLOW);
+		sprintf(cmd_string,"URL: %d ",g_url);
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
         break;
 	}
 
