@@ -5,8 +5,8 @@
 
 extern uint g_centre_freq;
 
-extern uint g_zoom;
-extern uint g_speed;
+extern int g_zoom;
+extern int g_speed;
 extern uint g_url;
 extern uint g_tab_width;
 extern uint g_tab_height;
@@ -20,10 +20,9 @@ int cmd_select;
 char cmd_string[16];
 
 
-void clear_tab(int tab)
+void clear_tab(int tab,uint16_t colour)
 {
-
-clear_rectangle(cmd_buf,(tab * g_tab_width)+3, 4, (tab * g_tab_width)+g_tab_width-4,g_tab_height,C_RED);
+clear_rectangle(cmd_buf,(tab * g_tab_width)+3, 4, (tab * g_tab_width)+g_tab_width-4,g_tab_height,colour);
 }
 
 
@@ -109,7 +108,7 @@ if(ioctl( fds, EVIOCGRAB, 1 ) < 0)
 printf("Shuttle device connected. dv: %d\n",fds);;
 
 cmd_select = 0;
-update_cmd();
+//update_cmd();
 
 /*
 char freq_string[8];
@@ -127,7 +126,6 @@ int deb = 0;
 
 while(1)
 	{
-//printf("looping \n");
 n=read(fds,&ev,sizeof (ev));
 //printf (" n= %d\n",n);
 if(n > 0)
@@ -139,9 +137,7 @@ printf(" Type: %d Code: %d  Value: %d \n",ev.type,ev.code,ev.value);
 
 printf(" Count =%d \n",deb++);
 
-clear_rectangle(cmd_buf,200,0,300,80,C_RED);
-clear_tab(3);
-
+//check for command change
 	if(ev.code ==264 && ev.value ==1)
 		{
 		cmd_select +=1;
@@ -154,61 +150,104 @@ clear_tab(3);
 		if(cmd_select < 0 ) cmd_select = 0;
 		}
 
+//undo all select colours
+for(int cs = 0 ; cs < 5; cs++)
+	{
+	plot_thick_rectangle(cmd_buf,g_tab_width*cs,0,g_tab_width,CMD_HEIGHT-6,C_YELLOW);
+	}
 
+//show the chosen one
+plot_thick_rectangle(cmd_buf,g_tab_width*cmd_select,0,g_tab_width,CMD_HEIGHT-6,C_RED);
+
+switch (cmd_select)
+	{
+	case 0:
+        sprintf(cmd_string,"System. ");
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+        break;
+	case 1:
+		sprintf(cmd_string,"Zoom: %d ",g_zoom);
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+        break;
+	case 2:
+		sprintf(cmd_string,"CF: %d ",g_centre_freq);
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+        break;
+	case 3:
+		sprintf(cmd_string,"Speed: %d ",g_speed);
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+        break;
+	case 4:
+		sprintf(cmd_string,"URL: %d ",g_url);
+        plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+        break;
+	}
+
+copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+
+
+// 111
+if(cmd_select == 1)
+	{
 
 	if(ev.code ==263 && ev.value ==1)
 		{
-		if(cmd_select == 1)
-			{
 			g_zoom +=1;
-			if(g_speed > 14) 
-				g_speed = 14;
-			sprintf(cmd_string,"        ");
-			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
-
-
+			if(g_zoom > 14) 
+				g_zoom = 14;
+		clear_tab(1,C_BLACK);
 			sprintf(cmd_string,"Zoom: %d ",g_zoom);
 			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
-copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
-			}
-		if(cmd_select == 3)
-			{
-			g_speed +=1;
-			if(g_speed > 3) g_speed = 3;
-			}
-		if(cmd_select == 4)
-			{
-			g_url +=1;
-			if(g_speed > 9) g_speed = 9;
-			}
+	copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+	
 		}
 	
 	if(ev.code ==261 && ev.value ==1)
 		{
-		if(cmd_select ==1)
-			{
 			g_zoom -=1;
 			if(g_zoom < 0 ) 
 				g_zoom = 0;
-			sprintf(cmd_string,"        ");
-			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
-
+		
+			clear_tab(1,C_BLACK);
 			sprintf(cmd_string,"Zoom: %d ",g_zoom);
 			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
 copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 			}
-		if(cmd_select == 3)
-			{
-			g_speed -=1;
-			if(g_speed <0) g_speed = 0;
-			}
-		if(cmd_select == 4)
-			{
-			g_url -=1;
-			if(g_speed <0) g_speed = 0;
-			}
-		}
 
+ }
+
+//111
+
+// 333
+if(cmd_select == 3)
+	{
+
+	if(ev.code ==263 && ev.value ==1)
+		{
+			g_speed +=1;
+			if(g_speed > 3) 
+				g_speed = 3;
+		clear_tab(3,C_BLACK);
+			sprintf(cmd_string,"Speed: %d ",g_speed);
+			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+	copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+	
+		}
+	
+	if(ev.code ==261 && ev.value ==1)
+		{
+			g_speed -=1;
+			if(g_speed < 0 ) 
+				g_speed = 0;
+		
+			clear_tab(3,C_BLACK);
+			sprintf(cmd_string,"Speed: %d ",g_speed);
+			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+			}
+
+}
+//333
 
 
 
@@ -216,9 +255,10 @@ copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 printf(" ACT %d \n",cmd_select);
 
 g_centre_freq +=1234;
-update_cmd();
+//update_cmd();
 		}
 //usleep(100000);
 //printf(" \n");
-	}
+	
+}
 }
