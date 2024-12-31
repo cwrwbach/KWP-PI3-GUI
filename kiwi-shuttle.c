@@ -3,6 +3,8 @@
 #include "kiwi-colours.h"
 #include "kiwi-lib.h"
 
+#include <vws/websocket.h>
+
 extern uint g_centre_freq;
 
 extern int g_zoom;
@@ -14,7 +16,7 @@ extern uint g_tab_height;
 
 extern uint16_t * cmd_buf;
 extern uint g_screen_size_x;
-
+extern vws_cnx* cnx;
 
 int cmd_select;
 char cmd_string[16];
@@ -26,7 +28,7 @@ clear_rectangle(cmd_buf,(tab * g_tab_width)+3, 4, (tab * g_tab_width)+g_tab_widt
 }
 
 
-void update_cmd()
+void xxxupdate_cmd()
 {
 for(int cs = 0 ; cs < 5; cs++)
 	{
@@ -213,7 +215,14 @@ if(cmd_select == 1)
 			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
 copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 			}
+char sz[32];
 
+sprintf(sz,"SET zoom=%d cf=15000",g_zoom);
+
+
+vws_frame_send_text(cnx,sz);
+//vws_frame_send_text(cnx,"SET zoom=5 cf=5505"); 
+usleep(100000);
  }
 
 //111
@@ -245,6 +254,16 @@ if(cmd_select == 3)
 			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
 copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 			}
+
+char ss[32];
+
+sprintf(ss,"SET wf_speed=%d",g_speed);
+
+
+vws_frame_send_text(cnx,ss);
+//vws_frame_send_text(cnx,"SET zoom=5 cf=5505"); 
+usleep(100000);
+
 
 }
 //333
