@@ -7,6 +7,7 @@
 #define SPEC_BASE_LINE 199
 #define WFALL_HEIGHT 450
 #define WFALL_Y_POS 220
+#define CMD_TABS 5
 #define CMD_HEIGHT 90
 #define CMD_POS 670
 

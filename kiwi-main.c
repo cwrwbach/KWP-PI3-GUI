@@ -12,6 +12,8 @@ uint g_centre_freq;
 uint g_zoom;
 uint g_speed;
 uint g_url;
+uint g_ntabs;
+uint g_tab_width;
 
 
 int8_t kiwi_buf[FFT_SIZE];
@@ -256,6 +258,8 @@ cmd_buf = malloc(g_screen_size_x*CMD_HEIGHT*bytes_pp);
 frame_buf = (uint16_t * ) mmap(0, fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 
 clear_screen(rgb565(0,3,0));
+
+//make Spectrum frame
 plot_thick_rectangle(frame_buf,0,0,g_screen_size_x,210,C_BLUE);
 
 plot_large_string(frame_buf,320,600,"WAITING FOR KIWI",C_WHITE);
@@ -270,8 +274,12 @@ int ret=pthread_create(&callback_id,NULL, (void *) setup_kiwi,NULL);
 
 printf(" SETUP ==========================  \n");
 
-//plot_thick_rectangle(frame_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT,C_YELLOW);
-plot_thick_rectangle(cmd_buf,0,0,g_screen_size_x,CMD_HEIGHT-6,C_YELLOW);
+//Make command tabs
+g_ntabs = CMD_TABS;
+g_tab_width = g_screen_size_x / g_ntabs;
+
+for(int t = 0; t < g_ntabs;t++)
+    plot_thick_rectangle(cmd_buf,t * g_tab_width,0,(t*g_tab_width) + g_tab_width,CMD_HEIGHT-6,C_YELLOW);
 
 draw_home_cmd();
 draw_speed_cmd();

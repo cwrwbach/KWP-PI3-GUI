@@ -22,7 +22,7 @@
 
 //short rgb565(short red,short green,short blue);
 
-
+void copy_block_to_fb(uint16_t * ,uint, uint);
 
 void set_pixel(uint16_t * buf,int x, int y, uint16_t colour);
 
