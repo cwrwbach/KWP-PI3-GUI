@@ -8,27 +8,33 @@ extern uint g_centre_freq;
 extern uint g_zoom;
 extern uint g_speed;
 extern uint g_url;
-
+extern uint g_tab_width;
+extern uint g_tab_height;
 
 
 extern uint16_t * cmd_buf;
 extern uint g_screen_size_x;
-extern int box_width;
+
 
 int cmd_select;
 char cmd_string[16];
 
 
-void update_cmd()
+void clear_tab(int tab)
 {
 
+clear_rectangle(cmd_buf,(tab * g_tab_width)+3, 4, (tab * g_tab_width)+g_tab_width-4,g_tab_height,C_RED);
+}
 
+
+void update_cmd()
+{
 for(int cs = 0 ; cs < 5; cs++)
 	{
-	plot_thick_rectangle(cmd_buf,box_width*cs,0,box_width,CMD_HEIGHT-6,C_YELLOW);
+	plot_thick_rectangle(cmd_buf,g_tab_width*cs,0,g_tab_width,CMD_HEIGHT-6,C_YELLOW);
 	}
 
-plot_thick_rectangle(cmd_buf,box_width*cmd_select,0,box_width,CMD_HEIGHT-6,C_RED);
+plot_thick_rectangle(cmd_buf,g_tab_width*cmd_select,0,g_tab_width,CMD_HEIGHT-6,C_RED);
 
 copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 
@@ -133,6 +139,9 @@ printf(" Type: %d Code: %d  Value: %d \n",ev.type,ev.code,ev.value);
 
 printf(" Count =%d \n",deb++);
 
+clear_rectangle(cmd_buf,200,0,300,80,C_RED);
+clear_tab(3);
+
 	if(ev.code ==264 && ev.value ==1)
 		{
 		cmd_select +=1;
@@ -199,6 +208,7 @@ copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 			if(g_speed <0) g_speed = 0;
 			}
 		}
+
 
 
 

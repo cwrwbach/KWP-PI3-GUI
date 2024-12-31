@@ -8,6 +8,7 @@
 #define WFALL_HEIGHT 450
 #define WFALL_Y_POS 220
 #define CMD_TABS 5
+#define TAB_HEIGHT 80
 #define CMD_HEIGHT 90
 #define CMD_POS 670
 

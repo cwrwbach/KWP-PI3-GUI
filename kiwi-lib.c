@@ -221,6 +221,13 @@ for(int n = 0; n< sz_y;n++)
     }
 }
 
+void clear_rectangle(uint16_t * buf, int x, int y,int xx, int yy, uint16_t colour)
+{
+for(int line = 1; line < yy;line ++)
+    {
+    plot_line(buf, x,line,xx,line,colour);
+    }
+}
 
 /*
 void plot_button(int16_t * buf,int x0,int y0,int sz_x, int sz_y,uint16_t backround_col,uint16_t border_col,uint16_t text_col,char text[40])

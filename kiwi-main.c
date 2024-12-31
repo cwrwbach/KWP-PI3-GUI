@@ -14,6 +14,7 @@ uint g_speed;
 uint g_url;
 uint g_ntabs;
 uint g_tab_width;
+uint g_tab_height;
 
 
 int8_t kiwi_buf[FFT_SIZE];
@@ -277,6 +278,7 @@ printf(" SETUP ==========================  \n");
 //Make command tabs
 g_ntabs = CMD_TABS;
 g_tab_width = g_screen_size_x / g_ntabs;
+g_tab_height = TAB_HEIGHT;
 
 for(int t = 0; t < g_ntabs;t++)
     plot_thick_rectangle(cmd_buf,t * g_tab_width,0,(t*g_tab_width) + g_tab_width,CMD_HEIGHT-6,C_YELLOW);
