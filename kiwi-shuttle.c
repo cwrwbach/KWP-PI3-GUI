@@ -63,7 +63,7 @@ copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 			}
 char sz[32];
 
-sprintf(sz,"SET zoom=%d cf=15000",g_zoom);
+sprintf(sz,"SET zoom=%d cf=%d",g_zoom,g_centre_freq);
 
 
 vws_frame_send_text(cnx,sz);
@@ -82,11 +82,11 @@ void update_speed()
 		clear_tab(3,C_BLACK);
 			sprintf(cmd_string,"Speed: %d ",g_speed);
 			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
-	copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+		copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 	
 		}
 	
-	if(ev.code ==261 && ev.value ==1)
+if(ev.code ==261 && ev.value ==1)
 		{
 			g_speed -=1;
 			if(g_speed < 0 ) 
@@ -95,7 +95,7 @@ void update_speed()
 			clear_tab(3,C_BLACK);
 			sprintf(cmd_string,"Speed: %d ",g_speed);
 			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
-copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+			copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
 			}
 
 char ss[32];
@@ -112,6 +112,39 @@ usleep(100000);
 
 void update_cf ()
 {
+
+if(ev.code ==263 && ev.value ==1)
+		{
+			g_centre_freq +=1;
+			if(g_centre_freq > 30000) 
+				g_centre_freq = 30000;
+		clear_tab(2,C_BLACK);
+			sprintf(cmd_string,"CF: %d ",g_centre_freq);
+			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+		copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+	
+		}
+	
+if(ev.code ==261 && ev.value ==1)
+		{
+			g_centre_freq -=1;
+			if(g_centre_freq < 0 ) 
+				g_centre_freq = 0;
+		
+			clear_tab(2,C_BLACK);
+			sprintf(cmd_string,"CF: %d",g_centre_freq);
+			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+			copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
+			}
+
+char scf[32];
+
+sprintf(scf,"SET zoom=%d cf=%d",g_zoom,g_centre_freq);
+vws_frame_send_text(cnx,scf);
+//vws_frame_send_text(cnx,"SET zoom=5 cf=5505"); 
+usleep(100000);
+
+//cnx,"SET zoom=3 cf=5505")
 }
 
 //---
@@ -190,14 +223,17 @@ switch (cmd_select)
 	case 1:
 		sprintf(cmd_string,"Zoom: %d ",g_zoom);
         plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+	update_zoom();
         break;
 	case 2:
 		sprintf(cmd_string,"CF: %d ",g_centre_freq);
         plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+	update_cf();
         break;
 	case 3:
 		sprintf(cmd_string,"Speed: %d ",g_speed);
         plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
+	update_speed();
         break;
 	case 4:
 		sprintf(cmd_string,"URL: %d ",g_url);
@@ -205,102 +241,27 @@ switch (cmd_select)
         break;
 	}
 
-copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
-
-
-// 111
-if(cmd_select == ZOOM)
-	{
-	update_zoom();
-	}
-/*
-	if(ev.code ==263 && ev.value ==1)
-		{
-			g_zoom +=1;
-			if(g_zoom > 14) 
-				g_zoom = 14;
-		clear_tab(1,C_BLACK);
-			sprintf(cmd_string,"Zoom: %d ",g_zoom);
-			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
 	copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
-	
+
+
+	/*	
+	if(cmd_select == ZOOM)
+		{
+		update_zoom();
 		}
-	
-	if(ev.code ==261 && ev.value ==1)
+
+	if(cmd_select == SPEED)
 		{
-			g_zoom -=1;
-			if(g_zoom < 0 ) 
-				g_zoom = 0;
-		
-			clear_tab(1,C_BLACK);
-			sprintf(cmd_string,"Zoom: %d ",g_zoom);
-			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
-copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
-			}
-char sz[32];
-
-sprintf(sz,"SET zoom=%d cf=15000",g_zoom);
-
-
-vws_frame_send_text(cnx,sz);
-//vws_frame_send_text(cnx,"SET zoom=5 cf=5505"); 
-usleep(100000);
-*/
- 
-//111
-
-// 333
-if(cmd_select == SPEED)
-	{
-update_speed();
-/*
-	if(ev.code ==263 && ev.value ==1)
-		{
-			g_speed +=1;
-			if(g_speed > 3) 
-				g_speed = 3;
-		clear_tab(3,C_BLACK);
-			sprintf(cmd_string,"Speed: %d ",g_speed);
-			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
-	copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
-	
+		update_speed();
 		}
-	
-	if(ev.code ==261 && ev.value ==1)
-		{
-			g_speed -=1;
-			if(g_speed < 0 ) 
-				g_speed = 0;
-		
-			clear_tab(3,C_BLACK);
-			sprintf(cmd_string,"Speed: %d ",g_speed);
-			plot_large_string(cmd_buf,(cmd_select * 275) +50,40,cmd_string,C_YELLOW);
-copy_surface_to_framebuf(cmd_buf,0,CMD_POS,g_screen_size_x,CMD_HEIGHT);
-			}
-
-char ss[32];
-
-sprintf(ss,"SET wf_speed=%d",g_speed);
-
-
-vws_frame_send_text(cnx,ss);
-//vws_frame_send_text(cnx,"SET zoom=5 cf=5505"); 
-usleep(100000);
 */
-
-
-//333
-
-}
-
 
 printf(" ACT %d \n",cmd_select);
 
-g_centre_freq +=1234;
-//update_cmd();
-		}
-//usleep(100000);
-//printf(" \n");
+//g_centre_freq +=1234;
+
+		}// n > 0
+
 	
-}
+	}//while(1)
 }
