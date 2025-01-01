@@ -3,6 +3,7 @@
 #include "kiwi-colours.h"
 #include "kiwi-jet.h"
 #include <linux/kd.h>
+#define INTERP 0
 
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
@@ -148,13 +149,17 @@ for(int n = 1; n < FFT_SIZE; n++)
     val= 127 + level; //must not go negative here
     val *=2; //Scale up * 2
     plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour); //Plots pos've from bottom left.
-
-    if(xtra > 3)
+    
+    if(INTERP)
         {
-        xtra = 0;
-        xpos++;
-        plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour); //Plots pos've from bottom left.
+        if(xtra > 3)
+            {
+            xtra = 0;
+            xpos++;
+            plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour); //Plots pos've from bottom left.
+            }
         }
+
     xpos++;
     xtra++;
     }
@@ -184,7 +189,7 @@ wf_ln++;
 if(wf_ln > WFALL_HEIGHT)
     wf_ln = 1;
 
-xpos = 170; //FIXME X POS WFALL
+xpos = 42; //FIXME X POS WFALL
 
 //Draw first line of waterfall
 for(point=0;point<1024;point++) //FFT SIZE
