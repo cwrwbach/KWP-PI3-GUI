@@ -140,11 +140,12 @@ kiwi_buf[10] = -40; //just a test/debug value
 kiwi_buf[14] = -60; 
 kiwi_buf[18] = -80; 
 
+
 int xtra; //Experimental interpolation of 25% to make 1024 bins display as 1280 pixels
 for(int n = 1; n < FFT_SIZE; n++)
     {
-    level = kiwi_buf[n];
-    val= 120 + level; 
+    level = kiwi_buf[n]; //should be compensated for each Zoom value
+    val= 127 + level; //must not go negative here
     val *=2; //Scale up * 2
     plot_line(spec_buf,xpos,spec_base , xpos,spec_base - val,colour); //Plots pos've from bottom left.
 
@@ -157,6 +158,7 @@ for(int n = 1; n < FFT_SIZE; n++)
     xpos++;
     xtra++;
     }
+
 copy_surface_to_framebuf(spec_buf,0,6,g_screen_size_x,SPEC_HEIGHT);
 }
 
